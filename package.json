@@ -1,0 +1,26 @@
+{
+  "name": "alpinejs-router",
+  "version": "1.0.0",
+  "description": "Easy to use and flexible router for Alpine.js",
+  "main": "dist/module.cjs.js",
+  "module": "dist/module.esm.js",
+  "unpkg": "dist/cdn.min.js",
+  "keywords": [
+    "alpinejs-router",
+    "alpinejs router"
+  ],
+  "scripts": {
+    "unpkg": "esbuild builds/cdn.js --platform=browser --bundle --minify --outfile=dist/cdn.min.js",
+    "cjs": "esbuild builds/module.js --platform=node --bundle --outfile=dist/module.cjs.js",
+    "esm": "esbuild builds/module.js --platform=neutral --bundle --outfile=dist/module.esm.js"
+  },
+  "author": "Shaun Li <shonhen@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/shaunlee/alpinejs-router",
+  "devDependencies": {
+    "esbuild": "^0.15.9"
+  },
+  "peerDependencies": {
+    "alpinejs": "^3.0.0"
+  }
+}
