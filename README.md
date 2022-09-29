@@ -2,6 +2,26 @@
 
 Easy to use and flexible router for Alpine.js
 
+## Installation
+
+### npm
+
+```bash
+npm install @shaun/alpinejs-router
+```
+
+### yarn
+
+```bash
+yarn add @shaun/alpinejs-router
+```
+
+### cdn
+
+```html
+<script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/cdn.min.js" defer></script>
+```
+
 ## Getting Started
 
 ```html
