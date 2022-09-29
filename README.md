@@ -171,7 +171,7 @@ If the URL doesn't match any static assets, it should serve the same `index.html
 
 ## Route directive
 
-Declare routes by creating a template tag with x-route attribute.
+Declare routes by creating a template tag with `x-route` attribute.
 
 ```html
 <template x-route="/path/to/route">
@@ -210,29 +210,43 @@ Declare routes by creating a template tag with x-route attribute.
 ### Properties
 
 ```html
+<!-- String $route.path -->
 <span x-text="$router.path"></span>
 
+<!-- Object $route.query -->
 <span x-text="$router.query.page"></span>
 
+<!-- Object $route.params -->
 <span x-text="$router.params.userId"></span>
 
+<!-- Boolean $route.loading -->
 <span x-show="$router.loading">Separate template file is loading</span>
 ```
 
 ### Methods
 
 ```html
-<button @click="$router.push('/path/to/route')"></button>
-<button @click="$router.push('/path/to/route', { replace: true })"></button>
+<!-- Navigate to -->
+<button @click="$router.push('/path/to/route')">...</button>
+<!-- Replace to -->
+<button @click="$router.push('/path/to/route', { replace: true })">...</button>
 
-<button @click="$router.replace('/path/to/route')"></button>
+<!-- Replace to -->
+<button @click="$router.replace('/path/to/route')">...</button>
 
+<!-- Add queries to the current URL -->
 <a x-link x-bind:href="$router.resolve({ page: 2 })">Page 2/10</a>
 
-<body x-data x-init="$router.config({ base: '/prefix/' })"></body>
-<body x-data x-init="$router.config({ mode: 'web', base: '/prefix/' })"></body>
-<body x-data x-init="$router.config({ mode: 'hash' })"></body>
-<body x-data x-init="$router.config({ mode: 'hash', base: '/prefix/' })"></body>
+<!-- Mode 'web' with prefix -->
+<body x-data x-init="$router.config({ base: '/prefix/' })">...</body>
+<!-- Mode 'web' with prefix -->
+<body x-data x-init="$router.config({ mode: 'web', base: '/prefix/' })">...</body>
+<!-- Mode 'hash' with no prefix -->
+<body x-data x-init="$router.config({ mode: 'hash' })">...</body>
+<!-- Mode 'hash' with prefix -->
+<body x-data x-init="$router.config({ mode: 'hash', base: '/prefix/' })">...</body>
+<!-- Do nothing by default to mode 'web' with no prefix -->
+<body x-data>...</body>
 ```
 
 ## License
