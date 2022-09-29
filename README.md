@@ -1,5 +1,8 @@
 # alpinejs-router
 
+![NPM](https://img.shields.io/npm/l/@shaun/alpinejs-router)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/shaunlee/alpinejs-router)
+
 Easy to use and flexible router for Alpine.js
 
 ## Installation
