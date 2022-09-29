@@ -9,35 +9,7 @@ export default function (Alpine) {
     loading: false
   })
 
-  function push (path, options = {}) {
-    if (!path.startsWith(location.origin)) {
-      if (state.mode === 'hash') {
-        path = location.origin + (state.base || '/') + '#' + path
-      } else {
-        path = location.origin + state.base + path
-      }
-    }
-    if (location.href !== path) {
-      history[options.replace ? 'replaceState' : 'pushState']({}, '', path)
-      state.href = path
-    }
-  }
-
-  function replace (path) {
-    push(path, { replace: true })
-  }
-
-  Alpine.store('router', {
-    init () {
-      Alpine.effect(() => {
-        state.query = (state.href.indexOf('?') > -1)
-          ? Object.fromEntries(new URLSearchParams(state.href.split('?').pop()).entries())
-          : {}
-      })
-
-      window.addEventListener('popstate', () => state.href = location.href)
-    },
-
+  const router = {
     get path () {
       return state.path
     },
@@ -69,7 +41,35 @@ export default function (Alpine) {
         ...query
       }).toString()
     }
+  }
+
+  Alpine.magic('router', () => router)
+
+  Alpine.effect(() => {
+    state.query = (state.href.indexOf('?') > -1)
+      ? Object.fromEntries(new URLSearchParams(state.href.split('?').pop()).entries())
+      : {}
   })
+
+  window.addEventListener('popstate', () => state.href = location.href)
+
+  function push (path, options = {}) {
+    if (!path.startsWith(location.origin)) {
+      if (state.mode === 'hash') {
+        path = location.origin + (state.base || '/') + '#' + path
+      } else {
+        path = location.origin + state.base + path
+      }
+    }
+    if (location.href !== path) {
+      history[options.replace ? 'replaceState' : 'pushState']({}, '', path)
+      state.href = path
+    }
+  }
+
+  function replace (path) {
+    push(path, { replace: true })
+  }
 
   function buildPattern (path) {
     const pattern = path.split('/').map(e => {
