@@ -30,9 +30,11 @@ yarn add @shaun/alpinejs-router
 <a x-link href="/somewhere">Load template</a>
 
 <template x-route="/hello/:name">
+  <!-- Inner template -->
   <div>Say hello to <span x-text="$router.params.name"></span></div>
 </template>
 
+<!-- Separate template file -->
 <template x-route="/somewhere" template="/somewhere.html"></template>
 ```
 
@@ -166,6 +168,72 @@ the users will get a 404 error if they access `https://example.com/user/id` dire
 
 Not to worry: To fix the issue, all you need to do is add a simple catch-all fallback route to your server.
 If the URL doesn't match any static assets, it should serve the same `index.html` page that your app lives in. Beautiful, again!
+
+## Route directive
+
+Declare routes by creating a template tag with x-route attribute.
+
+```html
+<template x-route="/path/to/route">
+  <div x-data>
+    ...
+  </div>
+</template>
+
+<template x-route="/path/to/route" template="/path/to/template.html"></template>
+
+<!-- When declaring a template that is not found, the path parameter does not need to be specified -->
+<template x-route.notfound>
+  <div>
+    Error 404 not found
+  </div>
+</template>
+```
+
+## Link directive
+
+```html
+<!-- The same as $router.push -->
+<a x-link href="/path/to/route">...</a>
+
+<!-- The same as $router.replace -->
+<a x-link.replace href="/path/to/route">...</a>
+
+<!-- Activate the `active` and `exact-active` classes to router links -->
+<a x-link.activity">...</a>
+<!-- Custom active class and exact active class can be added by setting `active` and `exactActive` props to the `x-link.activity` directive -->
+<a x-link.activity="{ active: 'text-blue-500', exactActive: 'text-green-500' }">...</a>
+```
+
+## Magic $router
+
+### Properties
+
+```html
+<span x-text="$router.path"></span>
+
+<span x-text="$router.query.page"></span>
+
+<span x-text="$router.params.userId"></span>
+
+<span x-show="$router.loading">Separate template file is loading</span>
+```
+
+### Methods
+
+```html
+<button @click="$router.push('/path/to/route')"></button>
+<button @click="$router.push('/path/to/route', { replace: true })"></button>
+
+<button @click="$router.replace('/path/to/route')"></button>
+
+<a x-link x-bind:href="$router.resolve({ page: 2 })">Page 2/10</a>
+
+<body x-data x-init="$router.config({ base: '/prefix/' })"></body>
+<body x-data x-init="$router.config({ mode: 'web', base: '/prefix/' })"></body>
+<body x-data x-init="$router.config({ mode: 'hash' })"></body>
+<body x-data x-init="$router.config({ mode: 'hash', base: '/prefix/' })"></body>
+```
 
 ## License
 
