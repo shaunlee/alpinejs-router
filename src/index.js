@@ -5,7 +5,8 @@ export default function (Alpine) {
     href: location.href,
     path: '',
     query: {},
-    pathParams: {}
+    pathParams: {},
+    loading: false
   })
 
   function push (path, options = {}) {
@@ -45,6 +46,9 @@ export default function (Alpine) {
     },
     get params () {
       return state.pathParams[state.path] ?? {}
+    },
+    get loading () {
+      return state.loading
     },
     config (config = {}) {
       if (config.mode !== 'hash' && config.base && config.base.endsWith('/')) config.base = config.base.slice(0, -1)
@@ -122,11 +126,12 @@ export default function (Alpine) {
           el.innerHTML = templateCaches[url]
           make()
         } else {
+          state.loading = true
           fetch(url).then(r => r.text()).then(html => {
             templateCaches[url] = html
             el.innerHTML = html
             make()
-          })
+          }).finally(() => state.loading = false)
         }
       } else {
         console.error(`Template for '${expression}' is missing`)
