@@ -96,6 +96,17 @@ export default function (Alpine) {
       routePatterns[expression] = buildPattern(expression)
     }
 
+    const load = url => fetch(url).then(r => r.text()).then(html => {
+      templateCaches[url] = html
+      el.innerHTML = html
+    })
+
+    let loading
+    if (el.hasAttribute('template.preload')) {
+      const url = el.getAttribute('template.preload')
+      loading = load(url).finally(() => loading = false)
+    }
+
     function show () {
       if (el._x_currentIfEl) return el._x_currentIfEl
 
@@ -120,18 +131,18 @@ export default function (Alpine) {
 
       if (el.content.firstElementChild) {
         make()
-      } else if (el.hasAttribute('template')) {
-        const url = el.getAttribute('template')
+      } else if (el.hasAttribute('template') || el.hasAttribute('template.preload')) {
+        const url = el.getAttribute('template') || el.getAttribute('template.preload')
         if (templateCaches[url]) {
           el.innerHTML = templateCaches[url]
           make()
         } else {
-          state.loading = true
-          fetch(url).then(r => r.text()).then(html => {
-            templateCaches[url] = html
-            el.innerHTML = html
-            make()
-          }).finally(() => state.loading = false)
+          if (loading) {
+            loading.then(() => make())
+          } else {
+            state.loading = true
+            load(url).then(() => make()).finally(() => state.loading = false)
+          }
         }
       } else {
         console.error(`Template for '${expression}' is missing`)
