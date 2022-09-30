@@ -78,7 +78,7 @@ You can have multiple params in the same route, and they will map to correspondi
 | /users/:username | /users/eduardo | `{ username: 'eduardo' }` |
 | /users/:username/posts/:postId | /users/eduardo/posts/123 | `{ username: 'eduardo', postId: '123' }` |
 
-In addition to `$router.params`, the `$router` magic also exposes other useful information such as `$route.query` (if there is a query in the URL), `$router.path`, etc.
+In addition to `$router.params`, the `$router` magic also exposes other useful information such as `$router.query` (if there is a query in the URL), `$router.path`, etc.
 
 ## Routes' Matching Syntax
 
@@ -106,7 +106,7 @@ But in some scenarios we don't want to add that static section `/o/p`. However, 
 <template x-route="/:productName"></template>
 ```
 
-Now, going to `/25` will match `/:orderId` while going to anything else will match `/:productName`. The order of the `routes` array doesn't even matter!
+Now, going to `/25` will match `/:orderId` while going to anything else will match `/:productName`.
 
 ## Programmatic Navigation
 
@@ -213,16 +213,16 @@ Declare routes by creating a template tag with `x-route` attribute.
 ### Properties
 
 ```html
-<!-- String $route.path -->
+<!-- String $router.path -->
 <span x-text="$router.path"></span>
 
-<!-- Object $route.query -->
+<!-- Object $router.query -->
 <span x-text="$router.query.page"></span>
 
-<!-- Object $route.params -->
+<!-- Object $router.params -->
 <span x-text="$router.params.userId"></span>
 
-<!-- Boolean $route.loading -->
+<!-- Boolean $router.loading -->
 <span x-show="$router.loading">Separate template file is loading</span>
 ```
 
