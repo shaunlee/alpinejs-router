@@ -90,16 +90,25 @@ export default function (Alpine) {
 
   const routePatterns = {}
   const templateCaches = {}
+  const inProgress = {}
 
   Alpine.directive('route', (el, { modifiers, expression }, { effect, cleanup }) => {
     if (!modifiers.includes('notfound')) {
       routePatterns[expression] = buildPattern(expression)
     }
 
-    const load = url => fetch(url).then(r => r.text()).then(html => {
-      templateCaches[url] = html
-      el.innerHTML = html
-    })
+    const load = url => {
+      if (inProgress[url]) {
+        inProgress[url].then(html => el.innerHTML = html)
+      } else {
+        inProgress[url] = fetch(url).then(r => r.text()).then(html => {
+          templateCaches[url] = html
+          el.innerHTML = html
+          return html
+        })
+      }
+      return inProgress[url]
+    }
 
     let loading
     if (el.hasAttribute('template.preload')) {
