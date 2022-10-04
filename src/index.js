@@ -9,6 +9,10 @@ export default function (Alpine) {
     loading: false
   })
 
+  const route = Alpine.reactive({
+    patterns: {}
+  })
+
   const router = {
     get path () {
       return state.path
@@ -40,6 +44,30 @@ export default function (Alpine) {
         ...Object.fromEntries(new URLSearchParams(r || '').entries()),
         ...query
       }).toString()
+    },
+
+    is (...paths) {
+      const url = new URL(state.href)
+      const [pathname,] = (state.mode === 'hash')
+        ? url.hash.slice(1).split('?')
+        : [url.pathname.replace(state.base, ''),]
+
+      for (const path of paths) {
+        if (path === 'notfound') {
+          return Object.entries(route.patterns).findIndex(e => e[1] instanceof RegExp ? pathname.match(e[1]) : pathname === e[1]) === -1
+        }
+        const pattern = route.patterns[path]
+        if (pattern === undefined) continue
+
+        if (pattern instanceof RegExp && pattern.test(pathname)) {
+          return true
+        }
+        if (pattern === pathname) {
+          return true
+        }
+      }
+
+      return false
     }
   }
 
@@ -88,26 +116,26 @@ export default function (Alpine) {
     return pattern.indexOf('(?') > -1 ? new RegExp(`^${pattern}$`) : pattern
   }
 
-  const routePatterns = {}
   const templateCaches = {}
-  const inProgress = {}
+  const inLoadProgress = {}
+  const inMakeProgress = new Set()
 
   Alpine.directive('route', (el, { modifiers, expression }, { effect, cleanup }) => {
     if (!modifiers.includes('notfound')) {
-      routePatterns[expression] = buildPattern(expression)
+      route.patterns = { ...route.patterns, [expression]: buildPattern(expression) }
     }
 
     const load = url => {
-      if (inProgress[url]) {
-        inProgress[url].then(html => el.innerHTML = html)
+      if (inLoadProgress[url]) {
+        inLoadProgress[url].then(html => el.innerHTML = html)
       } else {
-        inProgress[url] = fetch(url).then(r => r.text()).then(html => {
+        inLoadProgress[url] = fetch(url).then(r => r.text()).then(html => {
           templateCaches[url] = html
           el.innerHTML = html
           return html
         })
       }
-      return inProgress[url]
+      return inLoadProgress[url]
     }
 
     let loading
@@ -120,6 +148,9 @@ export default function (Alpine) {
       if (el._x_currentIfEl) return el._x_currentIfEl
 
       const make = () => {
+        if (inMakeProgress.has(expression)) return
+        inMakeProgress.add(expression)
+
         const clone = el.content.cloneNode(true).firstElementChild
 
         Alpine.addScopeToNode(clone, {}, el)
@@ -136,6 +167,8 @@ export default function (Alpine) {
 
           delete el._x_currentIfEl
         }
+
+        Alpine.nextTick(() => inMakeProgress.delete(expression))
       }
 
       if (el.content.firstElementChild) {
@@ -167,14 +200,13 @@ export default function (Alpine) {
 
     effect(() => {
       const url = new URL(state.href)
-
-      let [pathname, search] = (state.mode === 'hash')
+      const [pathname, search] = (state.mode === 'hash')
         ? url.hash.slice(1).split('?')
         : [url.pathname.replace(state.base, ''), url.search]
 
       if (modifiers.includes('notfound')) {
         // console.time('404')
-        Object.entries(routePatterns).find(e => e[1] instanceof RegExp ? pathname.match(e[1]) : pathname === e[1])
+        Object.entries(route.patterns).findIndex(e => e[1] instanceof RegExp ? pathname.match(e[1]) : pathname === e[1]) > -1
           ? hide()
           : show()
         // console.timeEnd('404')
@@ -182,7 +214,7 @@ export default function (Alpine) {
       }
 
       // console.time('route')
-      const pattern = routePatterns[expression]
+      const pattern = route.patterns[expression]
       if (pattern instanceof RegExp) {
         const m = pathname.match(pattern)
         if (m) {

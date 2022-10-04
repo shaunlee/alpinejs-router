@@ -252,6 +252,10 @@ Declare routes by creating a template tag with `x-route` attribute.
 <body x-data x-init="$router.config({ mode: 'hash', base: '/prefix/' })">...</body>
 <!-- Do nothing by default to mode 'web' with no prefix -->
 <body x-data>...</body>
+
+<!-- Check if the route matches the current location -->
+<div x-show="$router.is('/path/to/route')">You can see me</div>
+<template x-if="$router.is('/path/to/route')">You can see me</template>
 ```
 
 ## License
