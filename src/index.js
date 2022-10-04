@@ -231,16 +231,8 @@ export default function (Alpine) {
           ? [elUrl.hash.slice(1).split('?').shift(), stateUrl.hash.slice(1).split('?').shift()]
           : [elUrl.pathname, stateUrl.pathname]
 
-        if (l !== (state.mode !== 'hash' ? state.base : '') + '/' && r.startsWith(l)) {
-          el.classList.add(classes.active)
-        } else {
-          el.classList.remove(classes.active)
-        }
-        if (l === r) {
-          el.classList.add(classes.exactActive)
-        } else {
-          el.classList.remove(classes.exactActive)
-        }
+        el.classList.toggle(classes.active, l !== (state.mode !== 'hash' ? state.base : '') + '/' && r.startsWith(l))
+        el.classList.toggle(classes.exactActive, l === r)
       })
     }
 
