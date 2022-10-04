@@ -5,12 +5,12 @@ export default function (Alpine) {
     href: location.href,
     path: '',
     query: {},
-    pathParams: {},
     loading: false
   })
 
   const route = Alpine.reactive({
-    patterns: {}
+    patterns: {},
+    pathParams: {}
   })
 
   const router = {
@@ -21,7 +21,7 @@ export default function (Alpine) {
       return state.query
     },
     get params () {
-      return state.pathParams[state.path] ?? {}
+      return route.pathParams[state.path] ?? {}
     },
     get loading () {
       return state.loading
@@ -219,7 +219,7 @@ export default function (Alpine) {
         const m = pathname.match(pattern)
         if (m) {
           state.path = pathname
-          state.pathParams = { ...state.pathParams, [pathname]: { ...m.groups } }
+          route.pathParams = { ...route.pathParams, [pathname]: { ...m.groups } }
           show()
         } else {
           hide()
