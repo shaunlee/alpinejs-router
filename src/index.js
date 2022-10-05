@@ -47,27 +47,7 @@ export default function (Alpine) {
     },
 
     is (...paths) {
-      const url = new URL(state.href)
-      const [pathname,] = (state.mode === 'hash')
-        ? url.hash.slice(1).split('?')
-        : [url.pathname.replace(state.base, ''),]
-
-      for (const path of paths) {
-        if (path === 'notfound') {
-          return Object.entries(route.patterns).findIndex(e => e[1] instanceof RegExp ? pathname.match(e[1]) : pathname === e[1]) === -1
-        }
-        const pattern = route.patterns[path]
-        if (pattern === undefined) continue
-
-        if (pattern instanceof RegExp && pattern.test(pathname)) {
-          return true
-        }
-        if (pattern === pathname) {
-          return true
-        }
-      }
-
-      return false
+      return is({ paths })
     }
   }
 
@@ -114,6 +94,41 @@ export default function (Alpine) {
       return e
     }).join('/')
     return pattern.indexOf('(?') > -1 ? new RegExp(`^${pattern}$`) : pattern
+  }
+
+  function is ({ paths, parseParams = false }) {
+    const url = new URL(state.href)
+    const [pathname,] = (state.mode === 'hash')
+      ? url.hash.slice(1).split('?')
+      : [url.pathname.replace(state.base, ''),]
+
+    for (const path of paths) {
+      if (path === 'notfound') {
+        return Object.entries(route.patterns).findIndex(
+          e => e[1] instanceof RegExp ? pathname.match(e[1]) : pathname === e[1]
+        ) === -1
+      }
+
+      const pattern = route.patterns[path]
+      if (pattern === undefined) continue
+
+      if (pattern instanceof RegExp) {
+        if (parseParams) {
+          const m = pathname.match(pattern)
+          if (m) {
+            state.path = pathname
+            route.pathParams = { ...route.pathParams, [pathname]: { ...m.groups } }
+            return true
+          }
+        } else if (pattern.test(pathname)) {
+          return true
+        }
+      } else if (pattern === pathname) {
+        return true
+      }
+    }
+
+    return false
   }
 
   const templateCaches = {}
@@ -199,38 +214,11 @@ export default function (Alpine) {
     }
 
     effect(() => {
-      const url = new URL(state.href)
-      const [pathname, search] = (state.mode === 'hash')
-        ? url.hash.slice(1).split('?')
-        : [url.pathname.replace(state.base, ''), url.search]
-
       if (modifiers.includes('notfound')) {
-        // console.time('404')
-        Object.entries(route.patterns).findIndex(e => e[1] instanceof RegExp ? pathname.match(e[1]) : pathname === e[1]) > -1
-          ? hide()
-          : show()
-        // console.timeEnd('404')
-        return
-      }
-
-      // console.time('route')
-      const pattern = route.patterns[expression]
-      if (pattern instanceof RegExp) {
-        const m = pathname.match(pattern)
-        if (m) {
-          state.path = pathname
-          route.pathParams = { ...route.pathParams, [pathname]: { ...m.groups } }
-          show()
-        } else {
-          hide()
-        }
-      } else if (pattern === pathname) {
-        state.path = pathname
-        show()
+        is({ paths: ['notfound'] }) ? show() : hide()
       } else {
-        hide()
+        is({ paths: [expression], parseParams: true }) ? show() : hide()
       }
-      // console.timeEnd('route')
     })
 
     cleanup(() => el._x_undoIf && el._x_undoIf())
