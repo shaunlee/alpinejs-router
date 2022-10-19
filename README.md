@@ -255,7 +255,8 @@ Declare routes by creating a template tag with `x-route` attribute.
 
 <!-- Check if the route matches the current location -->
 <div x-show="$router.is('/path/to/route')">You can see me</div>
-<template x-if="$router.is('/path/to/route1', '/path/to/route2', ...)">You can see me</template>
+<template x-if="$router.is('/path/to/route1', '/path/to/route2', ...)">You can see me also</template>
+<div x-show="$router.not('/path/to/route')">...</div>
 ```
 
 ## License

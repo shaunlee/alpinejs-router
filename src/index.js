@@ -48,6 +48,9 @@ export default function (Alpine) {
 
     is (...paths) {
       return is({ paths })
+    },
+    not (...paths) {
+      return !is({ paths })
     }
   }
 
