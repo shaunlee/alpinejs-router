@@ -2,6 +2,7 @@
   "name": "@shaun/alpinejs-router",
   "version": "1.2.2",
   "description": "Easy to use and flexible router for Alpine.js",
+  "type": "module",
   "main": "dist/module.cjs.js",
   "module": "dist/module.esm.js",
   "unpkg": "dist/cdn.min.js",
@@ -18,7 +19,11 @@
   "license": "MIT",
   "homepage": "https://github.com/shaunlee/alpinejs-router",
   "devDependencies": {
-    "esbuild": "^0.15.9"
+    "@babel/core": "^7.20.2",
+    "@babel/preset-env": "^7.20.2",
+    "babel-jest": "^29.2.2",
+    "esbuild": "^0.15.9",
+    "jest": "^29.2.2"
   },
   "peerDependencies": {
     "alpinejs": "^3.0.0"
