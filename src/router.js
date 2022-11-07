@@ -3,7 +3,6 @@ import { URLPattern } from './pattern'
 
 export class Router {
   #patterns = {}
-  #current
 
   add (route) {
     this.#patterns = {
@@ -17,7 +16,6 @@ export class Router {
     for (const [route, pattern] of Object.entries(this.#patterns)) {
       const found = URLPattern.match(target.path, pattern)
       if (found) {
-        this.#current = route
         return found === true ? {} : found
       }
     }
