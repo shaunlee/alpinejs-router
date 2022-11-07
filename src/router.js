@@ -24,12 +24,24 @@ export class Router {
     return false
   }
 
-  is (...routes) {
-    return routes.indexOf(this.#current) > -1
+  is (target, ...routes) {
+    for (const route of routes) {
+      const pattern = this.#patterns[route] ?? URLPattern.build(route)
+      if (URLPattern.is(target.path, pattern)) {
+        return true
+      }
+    }
+    return false
   }
 
-  not (...routes) {
-    return routes.indexOf(this.#current) === -1
+  not (target, ...routes) {
+    for (const route of routes) {
+      const pattern = this.#patterns[route] ?? URLPattern.build(route)
+      if (URLPattern.is(target.path, pattern)) {
+        return false
+      }
+    }
+    return true
   }
 
   notfound (target) {

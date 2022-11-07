@@ -44,10 +44,10 @@ export default function (Alpine) {
     },
 
     is (...paths) {
-      return router.is(paths)
+      return router.is(getTargetURL(state.href), ...paths)
     },
     not (...paths) {
-      return router.not(paths)
+      return router.not(getTargetURL(state.href), ...paths)
     },
     get notfound () {
       return router.notfound(getTargetURL(state.href))
@@ -172,7 +172,7 @@ export default function (Alpine) {
     Alpine.nextTick(() => {
       effect(() => {
         const target = getTargetURL(state.href)
-        const found = modifiers.includes('notfound') ? router.notfound(target) : router.is(expression)
+        const found = modifiers.includes('notfound') ? router.notfound(target) : router.is(target, expression)
         found ? show() : hide()
       })
     })
