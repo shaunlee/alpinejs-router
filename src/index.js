@@ -1,19 +1,20 @@
+import { RouterURL } from './url'
+import { Router } from './router'
+
 export default function (Alpine) {
+  const router = new Router()
+
   const state = Alpine.reactive({
     mode: 'web',
     base: '',
     href: location.href,
     path: '',
     query: {},
+    params: {},
     loading: false
   })
 
-  const route = Alpine.reactive({
-    patterns: {},
-    pathParams: {}
-  })
-
-  const router = {
+  const route = {
     get path () {
       return state.path
     },
@@ -21,7 +22,7 @@ export default function (Alpine) {
       return state.query
     },
     get params () {
-      return route.pathParams[state.path] ?? {}
+      return state.params
     },
     get loading () {
       return state.loading
@@ -39,27 +40,31 @@ export default function (Alpine) {
     },
 
     resolve (query = {}) {
-      let r = new URL(state.href).search
-      return state.base + (state.mode === 'hash' ? '#' : '') + state.path + '?' + new URLSearchParams({
-        ...Object.fromEntries(new URLSearchParams(r || '').entries()),
-        ...query
-      }).toString()
+      return getTargetURL(state.href).resolve(state.path, query).url
     },
 
     is (...paths) {
-      return is({ paths })
+      return router.is(paths)
     },
     not (...paths) {
-      return !is({ paths })
+      return router.not(paths)
+    },
+    get notfound () {
+      return router.notfound(getTargetURL(state.href))
     }
   }
 
-  Alpine.magic('router', () => router)
+  Alpine.magic('router', () => route)
+
+  function getTargetURL (href) {
+    return new RouterURL(href, { mode: state.mode, base: state.base })
+  }
 
   Alpine.effect(() => {
-    state.query = (state.href.indexOf('?') > -1)
-      ? Object.fromEntries(new URLSearchParams(state.href.split('?').pop()).entries())
-      : {}
+    const url = getTargetURL(state.href)
+    state.path = url.path
+    state.query = url.query
+    state.params = router.match(url)
   })
 
   window.addEventListener('popstate', () => state.href = location.href)
@@ -82,65 +87,13 @@ export default function (Alpine) {
     push(path, { replace: true })
   }
 
-  function buildPattern (path) {
-    const pattern = path.split('/').map(e => {
-      if (e.startsWith(':')) {
-        let field = e.substr(1)
-        let fieldPattern = '[^/]+'
-        const ef = field.match(/\((.+?)\)/)
-        if (ef) {
-          field = field.substr(0, field.indexOf('('))
-          fieldPattern = ef[1]
-        }
-        return `(?<${field}>${fieldPattern})`
-      }
-      return e
-    }).join('/')
-    return pattern.indexOf('(?') > -1 ? new RegExp(`^${pattern}$`) : pattern
-  }
-
-  function is ({ paths, parseParams = false }) {
-    const url = new URL(state.href)
-    const [pathname,] = (state.mode === 'hash')
-      ? url.hash.slice(1).split('?')
-      : [url.pathname.replace(state.base, ''),]
-
-    for (const path of paths) {
-      if (path === 'notfound') {
-        return Object.entries(route.patterns).findIndex(
-          e => e[1] instanceof RegExp ? pathname.match(e[1]) : pathname === e[1]
-        ) === -1
-      }
-
-      const pattern = route.patterns[path]
-      if (pattern === undefined) continue
-
-      if (pattern instanceof RegExp) {
-        if (parseParams) {
-          const m = pathname.match(pattern)
-          if (m) {
-            state.path = pathname
-            route.pathParams = { ...route.pathParams, [pathname]: { ...m.groups } }
-            return true
-          }
-        } else if (pattern.test(pathname)) {
-          return true
-        }
-      } else if (pattern === pathname) {
-        return true
-      }
-    }
-
-    return false
-  }
-
   const templateCaches = {}
   const inLoadProgress = {}
   const inMakeProgress = new Set()
 
   Alpine.directive('route', (el, { modifiers, expression }, { effect, cleanup }) => {
     if (!modifiers.includes('notfound')) {
-      route.patterns = { ...route.patterns, [expression]: buildPattern(expression) }
+      router.add(expression)
     }
 
     const load = url => {
@@ -156,10 +109,11 @@ export default function (Alpine) {
       return inLoadProgress[url]
     }
 
+    const tpl = el.getAttribute('template') ?? el.getAttribute('template.preload')
+
     let loading
     if (el.hasAttribute('template.preload')) {
-      const url = el.getAttribute('template.preload')
-      loading = load(url).finally(() => loading = false)
+      loading = load(tpl).finally(() => loading = false)
     }
 
     function show () {
@@ -191,17 +145,16 @@ export default function (Alpine) {
 
       if (el.content.firstElementChild) {
         make()
-      } else if (el.hasAttribute('template') || el.hasAttribute('template.preload')) {
-        const url = el.getAttribute('template') || el.getAttribute('template.preload')
-        if (templateCaches[url]) {
-          el.innerHTML = templateCaches[url]
+      } else if (tpl) {
+        if (templateCaches[tpl]) {
+          el.innerHTML = templateCaches[tpl]
           make()
         } else {
           if (loading) {
             loading.then(() => make())
           } else {
             state.loading = true
-            load(url).then(() => make()).finally(() => state.loading = false)
+            load(tpl).then(() => make()).finally(() => state.loading = false)
           }
         }
       } else {
@@ -216,26 +169,20 @@ export default function (Alpine) {
       }
     }
 
-    effect(() => {
-      if (modifiers.includes('notfound')) {
-        is({ paths: ['notfound'] }) ? show() : hide()
-      } else {
-        is({ paths: [expression], parseParams: true }) ? show() : hide()
-      }
+    Alpine.nextTick(() => {
+      effect(() => {
+        const target = getTargetURL(state.href)
+        const found = modifiers.includes('notfound') ? router.notfound(target) : router.is(expression)
+        found ? show() : hide()
+      })
     })
 
     cleanup(() => el._x_undoIf && el._x_undoIf())
   })
 
   Alpine.directive('link', (el, { modifiers, expression }, { evaluate, effect, cleanup }) => {
-    const url = new URL(el.href)
-    let expected
-    if (state.mode === 'hash') {
-      expected = url.origin + state.base + (url.hash || ('#' + url.pathname.replace(state.base, '') + url.search))
-    } else {
-      expected = url.origin + (url.pathname.startsWith(state.base) ? url.pathname : state.base + url.pathname) + url.search
-    }
-    if (expected !== url.href) el.href = expected
+    const url = getTargetURL(el.href)
+    el.href = url.resolve(url.path, url.query, true).url
 
     function go (e) {
       e.preventDefault()
@@ -249,13 +196,10 @@ export default function (Alpine) {
       classes.exactActive ??= 'exact-active'
 
       effect(() => {
-        const [elUrl, stateUrl] = [new URL(el.href), new URL(state.href)]
-        const [l, r] = (state.mode === 'hash')
-          ? [elUrl.hash.slice(1).split('?').shift(), stateUrl.hash.slice(1).split('?').shift()]
-          : [elUrl.pathname, stateUrl.pathname]
+        const [l, r] = [getTargetURL(el.href), getTargetURL(state.href)]
 
-        el.classList.toggle(classes.active, l !== (state.mode !== 'hash' ? state.base : '') + '/' && r.startsWith(l))
-        el.classList.toggle(classes.exactActive, l === r)
+        el.classList.toggle(classes.active, r.path.startsWith(l.path))
+        el.classList.toggle(classes.exactActive, l.path === r.path)
       })
     }
 
