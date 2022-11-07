@@ -3,11 +3,12 @@ import { URLPattern } from './pattern'
 
 export class Router {
   #patterns = {}
+  #cache = {}
 
   add (route) {
     this.#patterns = {
       ...this.#patterns,
-      [route]: URLPattern.build(route)
+      [route]: this.#cache[route] ?? URLPattern.build(route)
     }
   }
 
@@ -24,7 +25,8 @@ export class Router {
 
   is (target, ...routes) {
     for (const route of routes) {
-      const pattern = this.#patterns[route] ?? URLPattern.build(route)
+      const pattern = this.#patterns[route] ?? this.#cache[route] ?? URLPattern.build(route)
+      this.#cache[route] = pattern
       if (URLPattern.is(target.path, pattern)) {
         return true
       }
@@ -34,7 +36,8 @@ export class Router {
 
   not (target, ...routes) {
     for (const route of routes) {
-      const pattern = this.#patterns[route] ?? URLPattern.build(route)
+      const pattern = this.#patterns[route] ?? this.#cache[route] ?? URLPattern.build(route)
+      this.#cache[route] = pattern
       if (URLPattern.is(target.path, pattern)) {
         return false
       }
