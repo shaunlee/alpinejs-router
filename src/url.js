@@ -17,7 +17,11 @@ export class RouterURL {
 
   get path () {
     return (this.mode === 'hash')
-      ? this.#url.hash.slice(1).split('?').shift()
+      ? (
+        this.#url.hash
+        ? this.#url.hash.slice(1).split("?").shift()
+        : this.#url.href.replace(new RegExp('^' + this.#url.origin + this.base), '').split("?").shift()
+      )
       : this.#url.pathname.replace(this.base, '')
   }
 
@@ -32,7 +36,7 @@ export class RouterURL {
   resolve (path, params, replace = false) {
     let [l, r] = this.#url.href.split('?')
     l = (this.mode === 'hash')
-      ? l.replace(/#.+$/, '#' + path)
+      ? l.indexOf('#') > -1 ? l.replace(/#.+$/, '#' + path) : this.#url.origin + this.base + '#' + path
       : l.replace(new RegExp(this.#url.pathname + '$'), this.base + path)
     const q = replace
       ? new URLSearchParams(params).toString()

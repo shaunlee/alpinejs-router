@@ -75,5 +75,11 @@ describe('URL', () => {
       expect(u.resolve('/', {}, true).url).toBe('http://localhost/base#/')
       expect(u.resolve('', {}, true).url).toBe('http://localhost/base#')
     })
+
+    test('convert web to hash', () => {
+      const u = new RouterURL('http://localhost/hello/world?a=1&b=c', { mode: 'hash' })
+      expect(u.path).toBe('/hello/world')
+      expect(u.resolve('/xyz', {a: '123', d: 1}).url).toBe('http://localhost/#/xyz?a=123&b=c&d=1')
+    })
   })
 })

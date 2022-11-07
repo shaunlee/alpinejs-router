@@ -1,6 +1,6 @@
 {
   "name": "@shaun/alpinejs-router",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Easy to use and flexible router for Alpine.js",
   "type": "module",
   "main": "dist/module.cjs.js",
