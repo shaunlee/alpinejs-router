@@ -24,6 +24,7 @@ export class Router {
   }
 
   is (target, ...routes) {
+    console.assert(target instanceof RouterURL)
     for (const route of routes) {
       const pattern = this.#patterns[route] ?? this.#cache[route] ?? URLPattern.build(route)
       this.#cache[route] = pattern
@@ -35,6 +36,7 @@ export class Router {
   }
 
   not (target, ...routes) {
+    console.assert(target instanceof RouterURL)
     for (const route of routes) {
       const pattern = this.#patterns[route] ?? this.#cache[route] ?? URLPattern.build(route)
       this.#cache[route] = pattern
