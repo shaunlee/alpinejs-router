@@ -14,8 +14,9 @@ export class Router {
 
   match (target) {
     console.assert(target instanceof RouterURL)
+    const path = target.path
     for (const [route, pattern] of Object.entries(this.#patterns)) {
-      const found = URLPattern.match(target.path, pattern)
+      const found = URLPattern.match(path, pattern)
       if (found) {
         return found === true ? {} : found
       }
@@ -25,10 +26,11 @@ export class Router {
 
   is (target, ...routes) {
     console.assert(target instanceof RouterURL)
+    const path = target.path
     for (const route of routes) {
       const pattern = this.#patterns[route] ?? this.#cache[route] ?? URLPattern.build(route)
       this.#cache[route] = pattern
-      if (URLPattern.is(target.path, pattern)) {
+      if (URLPattern.is(path, pattern)) {
         return true
       }
     }
@@ -37,10 +39,11 @@ export class Router {
 
   not (target, ...routes) {
     console.assert(target instanceof RouterURL)
+    const path = target.path
     for (const route of routes) {
       const pattern = this.#patterns[route] ?? this.#cache[route] ?? URLPattern.build(route)
       this.#cache[route] = pattern
-      if (URLPattern.is(target.path, pattern)) {
+      if (URLPattern.is(path, pattern)) {
         return false
       }
     }
@@ -49,8 +52,9 @@ export class Router {
 
   notfound (target) {
     console.assert(target instanceof RouterURL)
-    return Object.keys(this.#patterns).findIndex(
-      e => URLPattern.is(target.path, e)
+    const path = target.path
+    return Object.values(this.#patterns).findIndex(
+      e => URLPattern.is(path, e)
     ) === -1
   }
 }
