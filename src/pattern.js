@@ -1,19 +1,22 @@
 export class URLPattern {
   static build (path) {
+    if (path.indexOf(':') === -1) {
+      return path
+    }
     const pattern = path.split('/').map(e => {
-      if (e.startsWith(':')) {
-        let field = e.substr(1)
-        let fieldPattern = '[^/]+'
-        const ef = field.match(/\((.+?)\)/)
-        if (ef) {
-          field = field.substr(0, field.indexOf('('))
-          fieldPattern = ef[1]
-        }
-        return `(?<${field}>${fieldPattern})`
+      if (!e.startsWith(':')) {
+        return e
       }
-      return e
+      let field = e.substr(1)
+      let fieldPattern = '[^/]+'
+      const ef = field.match(/\((.+?)\)/)
+      if (ef) {
+        field = field.substr(0, field.indexOf('('))
+        fieldPattern = ef[1]
+      }
+      return `(?<${field}>${fieldPattern})`
     }).join('/')
-    return pattern.indexOf('(?') > -1 ? new RegExp(`^${pattern}$`) : pattern
+    return new RegExp(`^${pattern}$`)
   }
 
   static match (path, pattern) {
