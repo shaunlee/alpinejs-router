@@ -25,6 +25,12 @@ yarn add @shaun/alpinejs-router
 <script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/cdn.min.js" defer></script>
 ```
 
+Older browsers
+
+```html
+<script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/es6.min.js" defer></script>
+```
+
 ## Getting Started
 
 ```html
