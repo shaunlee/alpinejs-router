@@ -22,7 +22,7 @@ export default function (Alpine) {
       return state.query
     },
     get params () {
-      return state.params
+      return state.params || {}
     },
     get loading () {
       return state.loading
