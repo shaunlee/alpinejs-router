@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@shaun/alpinejs-router examples</title>
+    <script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/es6.min.js" defer></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body x-data x-init="$router.config({ mode: 'hash' })" class="fixed inset-0 flex flex-col text-gray-900">
+    <header class="flex-none h-16 px-8 flex flex-row items-center border-b">
+      <h1 class="text-2xl"><code>@shaun/alpinejs-router</code> examples</h1>
+    </header>
+    <div class="flex-1 flex flex-row">
+      <aside class="flex-none w-72 border-r">
+        <ul>
+          <li><a x-link.activity="{ exactActive: 'text-blue-600' }" href="/" class="px-8 py-4 flex flex-row items-center hover:bg-blue-100">Home</a></li>
+          <li><a x-link.activity="{ exactActive: 'text-blue-600' }" href="/hello/someone" class="px-8 py-4 flex flex-row items-center hover:bg-blue-100">Hello Someone</a></li>
+          <li><a x-link.replace.activity="{ exactActive: 'text-blue-600' }" href="/replace-to" class="px-8 py-4 flex flex-row items-center hover:bg-blue-100">Replace To</a></li>
+          <li><a x-link.activity="{ exactActive: 'text-blue-600' }" href="/users/123" class="px-8 py-4 flex flex-row items-center hover:bg-blue-100">Regex Params</a></li>
+          <li><a x-link.activity="{ exactActive: 'text-blue-600' }" href="/users?enabled=true" class="px-8 py-4 flex flex-row items-center hover:bg-blue-100">With Query</a></li>
+          <li><a x-link.activity="{ exactActive: 'text-blue-600' }" href="/js-methods" class="px-8 py-4 flex flex-row items-center hover:bg-blue-100">JS Methods</a></li>
+          <li><a x-link.activity="{ exactActive: 'text-blue-600' }" href="/in-directive" class="px-8 py-4 flex flex-row items-center hover:bg-blue-100">In Directive</a></li>
+          <li><a x-link.activity="{ exactActive: 'text-blue-600' }" href="/not-found" class="px-8 py-4 flex flex-row items-center hover:bg-blue-100">Not Found</a></li>
+        </ul>
+      </aside>
+      <div class="flex-1 flex flex-col">
+        <div class="flex-1 relative">
+          <main class="absolute w-full h-full overflow-y-scroll">
+            <template x-route="" template.preload="/home.html"></template>
+            <template x-route="/" template.preload="/home.html"></template>
+
+            <template x-route="/hello/:name">
+              <div class="px-16 py-4">
+                <div>Hello <code x-text="$router.params.name"></code></div>
+              </div>
+            </template>
+
+            <template x-route="/replace-to">
+              <div class="px-16 py-4">
+                <div>Because this page was opened with the <code>`replace`</code> modifier, it will not appear in the <code>`window.history`</code></div>
+              </div>
+            </template>
+
+            <template x-route="/users/:id(\d+)">
+              <div class="px-16 py-4">
+                <div>Profile of the user with id <code x-text="$router.params.id"></code></div>
+              </div>
+            </template>
+
+            <template x-route="/users" template="/users.html">
+              <div class="px-16 py-4">
+                <div>
+                  User profiles that are
+                  <span x-show="$router.query.enabled === 'true'">enabled</span>
+                  <span x-show="$router.query.enabled !== 'true'">disabled</span>
+                </div>
+                <div class="pt-16">Current page is `<code x-text="$router.query.page ?? 1"></code>`</div>
+                <ul class="pt-16 flex flex-row items-center space-x-8">
+                  <li><a x-link :href="$router.resolve({ page: 1 })" class="hover:text-blue-600">Page1</a></li>
+                  <li><a x-link :href="$router.resolve({ page: 2 })" class="hover:text-blue-600">Page2</a></li>
+                  <li><a x-link :href="$router.resolve({ page: 100 })" class="hover:text-blue-600">Page100</a></li>
+                </ul>
+              </div>
+            </template>
+
+            <template x-route="/js-methods">
+              <div x-data="demo()" class="px-16 py-4 flex flex-col space-y-8">
+                <div>
+                  `<code>$router.push('/hello/world')</code>`
+                  <button @click="goto('/hello/world')" class="hover:text-blue-600">Clicking on me will go to the `<code>/hello/world</code>` page</button>
+                </div>
+                <div>
+                  `<code>$router.replace('/hello/world')</code>`
+                  <button @click="replaceTo('/hello/world')" class="hover:text-blue-600">Clicking on me will replace to the `<code>/hello/world</code>` page</button>
+                </div>
+                <div>
+                  `<code>$router.resolve({ a: 'b', c: 1 })</code>`:
+                  The resolved URL will be `<code x-text="$router.resolve({ a: 'b', c: 1 })"></code>`
+                </div>
+                <div>
+                  `<code>$router.is('/js-methods')</code>`:
+                  <span x-text="$router.is('/js-methods') ? 'yes' : 'no'"></span>,
+                  the current page is `<code>/js-methods</code>`
+                </div>
+                <div>
+                  `<code>$router.not('/hello/world')</code>`:
+                  <span x-text="$router.not('/hello/world') ? 'no' : 'yes'"></span>,
+                  the current page is not `<code>/hello/world</code>`
+                </div>
+              </div>
+            </template>
+
+            <template x-route="/in-directive">
+              <div class="px-16 py-4">
+                <button x-hello="$router" class="hover:text-blue-600">I've passed `<code>$router</code>` to `<code>Alpine.directive</code>`, click me to go to the home page</button>
+              </div>
+            </template>
+
+            <template x-route.notfound>
+              <div class="w-full h-full flex justify-center items-center">
+                <h2 class="text-2xl text-red-600">Error 404 not found</h2>
+              </div>
+            </template>
+          </main>
+        </div>
+        <footer class="flex-none border-t">
+          <div class="px-16 py-4">
+            <code>$router: <span x-text="JSON.stringify($router)"></span></code>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>
