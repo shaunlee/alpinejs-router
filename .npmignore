@@ -4,3 +4,5 @@ yarn.lock
 tests
 builds
 babel.config.cjs
+TODO
+examples
