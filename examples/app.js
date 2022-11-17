@@ -17,9 +17,9 @@ document.addEventListener('alpine:init', () => {
       $router.push('/')
     }
 
-    window.addEventListener('click', onclick, true)
+    el.addEventListener('click', onclick, true)
     cleanup(() => {
-      window.removeEventListener('click', onclick)
+      el.removeEventListener('click', onclick)
     })
   })
 })
