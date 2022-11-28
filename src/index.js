@@ -54,6 +54,7 @@ export default function (Alpine) {
     }
   }
 
+  Alpine.$router = route
   Alpine.magic('router', () => route)
 
   function getTargetURL (href) {
