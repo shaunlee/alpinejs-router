@@ -7,7 +7,7 @@ export default function (Alpine) {
   const state = Alpine.reactive({
     mode: 'web',
     base: '',
-    href: location.href,
+    href: location.origin,
     path: '',
     query: {},
     params: {},
@@ -68,6 +68,7 @@ export default function (Alpine) {
     state.params = router.match(url)
   })
 
+  Alpine.nextTick(() => state.href = location.href)
   window.addEventListener('popstate', () => state.href = location.href)
 
   function push (path, options = {}) {
