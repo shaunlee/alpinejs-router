@@ -68,7 +68,9 @@ export default function (Alpine) {
     state.params = router.match(url)
   })
 
-  Alpine.nextTick(() => state.href = location.href)
+  Alpine.nextTick(() => {
+    if (state.mode === 'web' && !state.base) state.href = location.href
+  })
   window.addEventListener('popstate', () => state.href = location.href)
 
   function push (path, options = {}) {
