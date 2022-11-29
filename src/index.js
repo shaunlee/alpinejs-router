@@ -7,7 +7,7 @@ export default function (Alpine) {
   const state = Alpine.reactive({
     mode: 'web',
     base: '',
-    href: location.origin,
+    href: location.href,
     path: '',
     query: {},
     params: {},
@@ -61,15 +61,17 @@ export default function (Alpine) {
     return new RouterURL(href, { mode: state.mode, base: state.base })
   }
 
-  Alpine.effect(() => {
+  function parse () {
     const url = getTargetURL(state.href)
     state.path = url.path
     state.query = url.query
     state.params = router.match(url)
-  })
+  }
+
+  Alpine.effect(() => parse())
 
   Alpine.nextTick(() => {
-    if (state.mode === 'web' && !state.base) state.href = location.href
+    if (state.mode === 'web' && !state.base) parse()
   })
   window.addEventListener('popstate', () => state.href = location.href)
 
