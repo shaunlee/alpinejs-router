@@ -73,7 +73,7 @@ A param is denoted by a colon `:`. When a route is matched, the value of its par
 Therefore, we can render the current user ID by updating user's template to this:
 
 ```html
-<div>User ID: {$router.params.id}</div>
+<div>User ID: <span x-text="$router.params.id"></span></div>
 ```
 
 You can have multiple params in the same route, and they will map to corresponding fields on `$router.params`. Examples:
