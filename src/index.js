@@ -115,7 +115,10 @@ export default function (Alpine) {
       return inLoadProgress[url]
     }
 
-    const tpl = el.getAttribute('template') ?? el.getAttribute('template.preload')
+    const tpl = RouterURL.resolveTemplatePath(
+      location.pathname,
+      el.getAttribute('template') ?? el.getAttribute('template.preload')
+    )
 
     let loading
     if (el.hasAttribute('template.preload')) {

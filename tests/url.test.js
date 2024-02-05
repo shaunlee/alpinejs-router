@@ -81,5 +81,28 @@ describe('URL', () => {
       expect(u.path).toBe('/hello/world')
       expect(u.resolve('/xyz', {a: '123', d: 1}).url).toBe('http://localhost/#/xyz?a=123&b=c&d=1')
     })
+
+    test('resolve template path', () => {
+      let pathname = new URL('http://localhost/hello/world').pathname
+      expect(RouterURL.resolveTemplatePath(pathname, '/a.html')).toStrictEqual('/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, './a.html')).toStrictEqual('/hello/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, '../a.html')).toStrictEqual('/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, '../../a.html')).toStrictEqual('/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, '../../../a.html')).toStrictEqual('/a.html')
+
+      pathname = new URL('http://localhost/hello/world/').pathname
+      expect(RouterURL.resolveTemplatePath(pathname, '/a.html')).toStrictEqual('/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, './a.html')).toStrictEqual('/hello/world/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, '../a.html')).toStrictEqual('/hello/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, '../../a.html')).toStrictEqual('/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, '../../../a.html')).toStrictEqual('/a.html')
+
+      pathname = new URL('http://localhost/').pathname
+      expect(RouterURL.resolveTemplatePath(pathname, '/a.html')).toStrictEqual('/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, './a.html')).toStrictEqual('/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, '../a.html')).toStrictEqual('/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, '../../a.html')).toStrictEqual('/a.html')
+      expect(RouterURL.resolveTemplatePath(pathname, '../../../a.html')).toStrictEqual('/a.html')
+    })
   })
 })

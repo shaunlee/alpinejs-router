@@ -37,4 +37,31 @@ export class RouterURL {
     this.url = l + (r ? '?' + r : '')
     return this
   }
+
+  static resolveTemplatePath (pathname, tpl) {
+    if (tpl.startsWith('/')) {
+      return tpl
+    }
+
+    const dir = pathname.slice(0, pathname.lastIndexOf('/'))
+
+    if (tpl.startsWith('./')) {
+      return dir + tpl.slice(1)
+    }
+
+    if (tpl.startsWith('../')) {
+      const re = /\.\.\//g
+      let i = tpl.match(re).length
+      let arr = dir.split('/')
+      while (i--) {
+        arr.pop()
+      }
+      if (arr.length === 0) {
+        arr = ['']
+      }
+      return [...arr, tpl.replace(re, '')].join('/')
+    }
+
+    return tpl
+  }
 }
