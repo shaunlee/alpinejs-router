@@ -39,6 +39,8 @@ export class RouterURL {
   }
 
   static resolveTemplatePath (pathname, tpl) {
+    if (!tpl) return tpl
+
     if (tpl.startsWith('/')) {
       return tpl
     }
