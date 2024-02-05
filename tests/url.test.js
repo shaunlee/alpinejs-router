@@ -103,6 +103,8 @@ describe('URL', () => {
       expect(RouterURL.resolveTemplatePath(pathname, '../a.html')).toStrictEqual('/a.html')
       expect(RouterURL.resolveTemplatePath(pathname, '../../a.html')).toStrictEqual('/a.html')
       expect(RouterURL.resolveTemplatePath(pathname, '../../../a.html')).toStrictEqual('/a.html')
+
+      expect(RouterURL.resolveTemplatePath(pathname)).toStrictEqual()
     })
   })
 })
