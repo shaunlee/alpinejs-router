@@ -191,6 +191,11 @@ Declare routes by creating a template tag with `x-route` attribute.
 <template x-route="/path/to/route" template="/path/to/template.html"></template>
 <!-- Preload the separate template file -->
 <template x-route="/path/to/route" template.preload="/path/to/template.html"></template>
+<!-- Relative paths -->
+<template x-route="/path/to/route" template="template.html"></template>
+<template x-route="/path/to/route" template="./template.html"></template>
+<template x-route="/path/to/route" template="../template.html"></template>
+<template x-route="/path/to/route" template="../../template.html"></template>
 
 <!-- When declaring a template that is not found, the path parameter does not need to be specified -->
 <template x-route.notfound>
