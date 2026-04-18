@@ -1,8 +1,70 @@
 import { RouterURL } from './url'
 import { Router } from './router'
 
+export function isActivePath (targetPath, currentPath) {
+  if (targetPath === '/') {
+    return currentPath === '/'
+  }
+
+  return currentPath === targetPath || currentPath.startsWith(targetPath + '/')
+}
+
+export function shouldHandleLinkClick (event, el, origin = location.origin) {
+  let href
+
+  try {
+    href = new URL(el.href, origin)
+  } catch {
+    return false
+  }
+
+  return !(
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    (el.target && el.target !== '_self') ||
+    el.hasAttribute('download') ||
+    href.origin !== origin
+  )
+}
+
+export function getTemplateRenderMode ({ hasInlineTemplate, templateUrl, hasCachedTemplate, preloadFailed }) {
+  if (!templateUrl) {
+    return hasInlineTemplate ? 'inline' : 'missing'
+  }
+
+  if (hasCachedTemplate) {
+    return 'external'
+  }
+
+  if (preloadFailed && hasInlineTemplate) {
+    return 'inline'
+  }
+
+  return 'load'
+}
+
+export function getRouteTemplateRoot (el, expression, reportError = console.error) {
+  const root = el.content.firstElementChild
+
+  if (!root) {
+    return null
+  }
+
+  if (root.nextElementSibling) {
+    reportError(`Route '${expression}' must render exactly one root element`)
+    return null
+  }
+
+  return root
+}
+
 export default function (Alpine) {
   const router = new Router()
+  let loadingCount = 0
 
   const state = Alpine.reactive({
     mode: 'web',
@@ -93,9 +155,23 @@ export default function (Alpine) {
     push(path, { replace: true })
   }
 
+  function trackLoading (promise) {
+    loadingCount += 1
+    state.loading = true
+
+    return promise.finally(() => {
+      loadingCount = Math.max(loadingCount - 1, 0)
+      state.loading = loadingCount > 0
+    })
+  }
+
+  function reportTemplateError (route, tpl, error) {
+    console.error(`Failed to load template '${tpl}' for route '${route}'`, error)
+  }
+
   const templateCaches = {}
   const inLoadProgress = {}
-  const inMakeProgress = new Set()
+  const inMakeProgress = new WeakSet()
 
   Alpine.directive('route', (el, { modifiers, expression }, { effect, cleanup }) => {
     if (!modifiers.includes('notfound')) {
@@ -103,16 +179,29 @@ export default function (Alpine) {
     }
 
     const load = url => {
+      const render = html => {
+        el.innerHTML = html
+        return html
+      }
+
       if (inLoadProgress[url]) {
-        inLoadProgress[url].then(html => el.innerHTML = html)
-      } else {
-        inLoadProgress[url] = fetch(url).then(r => r.text()).then(html => {
+        return inLoadProgress[url].then(render)
+      }
+
+      inLoadProgress[url] = fetch(url)
+        .then(r => {
+          if (!r.ok) {
+            throw new Error(`Failed to fetch template: ${r.status} ${r.statusText}`)
+          }
+          return r.text()
+        })
+        .then(html => {
           templateCaches[url] = html
-          el.innerHTML = html
           return html
         })
-      }
-      return inLoadProgress[url]
+        .finally(() => delete inLoadProgress[url])
+
+      return inLoadProgress[url].then(render)
     }
 
     const tpl = RouterURL.resolveTemplatePath(
@@ -121,18 +210,32 @@ export default function (Alpine) {
     )
 
     let loading
+    let preloadFailed = false
     if (el.hasAttribute('template.preload')) {
-      loading = load(tpl).finally(() => loading = false)
+      loading = trackLoading(load(tpl))
+        .then(() => true)
+        .catch(error => {
+          preloadFailed = true
+          reportTemplateError(expression, tpl, error)
+          return false
+        })
+        .finally(() => { loading = false })
     }
 
     function show () {
       if (el._x_currentIfEl) return el._x_currentIfEl
 
       const make = () => {
-        if (inMakeProgress.has(expression)) return
-        inMakeProgress.add(expression)
+        if (inMakeProgress.has(el)) return
 
-        const clone = el.content.cloneNode(true).firstElementChild
+        const root = getRouteTemplateRoot(el, expression)
+        if (!root) {
+          return
+        }
+
+        inMakeProgress.add(el)
+
+        const clone = root.cloneNode(true)
 
         Alpine.addScopeToNode(clone, {}, el)
 
@@ -149,22 +252,43 @@ export default function (Alpine) {
           delete el._x_currentIfEl
         }
 
-        Alpine.nextTick(() => inMakeProgress.delete(expression))
+        Alpine.nextTick(() => inMakeProgress.delete(el))
       }
 
-      if (el.content.firstElementChild) {
-        make()
-      } else if (tpl) {
+      const renderInline = () => {
+        if (el.content.firstElementChild) {
+          make()
+          return true
+        }
+        return false
+      }
+
+      const mode = getTemplateRenderMode({
+        hasInlineTemplate: Boolean(el.content.firstElementChild),
+        templateUrl: tpl,
+        hasCachedTemplate: Boolean(tpl && templateCaches[tpl]),
+        preloadFailed
+      })
+
+      if (mode === 'inline') {
+        renderInline()
+      } else if (mode === 'external') {
         if (templateCaches[tpl]) {
           el.innerHTML = templateCaches[tpl]
           make()
+        }
+      } else if (mode === 'load') {
+        if (loading) {
+          loading.then(loaded => loaded ? make() : renderInline())
         } else {
-          if (loading) {
-            loading.then(() => make())
-          } else {
-            state.loading = true
-            load(tpl).then(() => make()).finally(() => state.loading = false)
-          }
+          trackLoading(load(tpl))
+            .then(() => make())
+            .catch(error => {
+              reportTemplateError(expression, tpl, error)
+              if (!renderInline()) {
+                console.error(`Template for '${expression}' is missing`)
+              }
+            })
         }
       } else {
         console.error(`Template for '${expression}' is missing`)
@@ -194,6 +318,10 @@ export default function (Alpine) {
     el.href = url.resolve(url.path, url.query, true).url
 
     function go (e) {
+      if (!shouldHandleLinkClick(e, el, location.origin)) {
+        return
+      }
+
       e.preventDefault()
       push(el.href, { replace: modifiers.includes('replace') })
     }
@@ -207,7 +335,7 @@ export default function (Alpine) {
       effect(() => {
         const [l, r] = [getTargetURL(el.href), getTargetURL(state.href)]
 
-        el.classList.toggle(classes.active, r.path.startsWith(l.path))
+        el.classList.toggle(classes.active, isActivePath(l.path, r.path))
         el.classList.toggle(classes.exactActive, l.path === r.path)
       })
     }

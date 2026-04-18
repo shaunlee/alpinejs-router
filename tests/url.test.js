@@ -15,6 +15,13 @@ describe('URL', () => {
       expect(u.path).toBe('/hello/world')
     })
 
+    test('base only strips a leading path prefix', () => {
+      expect(new RouterURL('http://localhost/base', { base: '/base' }).path).toBe('/')
+      expect(new RouterURL('http://localhost/base/hello/world', { base: '/base' }).path).toBe('/hello/world')
+      expect(new RouterURL('http://localhost/foo/base/hello/world', { base: '/base' }).path).toBe('/foo/base/hello/world')
+      expect(new RouterURL('http://localhost/basement/hello/world', { base: '/base' }).path).toBe('/basement/hello/world')
+    })
+
     test('parse query', () => {
       const u = new RouterURL('http://localhost/hello/world?a=1&b=c')
       expect(u.query).toStrictEqual({a: '1', b: 'c'})
@@ -44,6 +51,11 @@ describe('URL', () => {
       const u = new RouterURL('http://localhost/#/hello/world', { mode: 'hash' })
       expect(u.mode).toBe('hash')
       expect(u.path).toBe('/hello/world')
+    })
+
+    test('empty hash path resolves to root', () => {
+      const u = new RouterURL('http://localhost/#', { mode: 'hash' })
+      expect(u.path).toBe('/')
     })
 
     test('with base', () => {

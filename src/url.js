@@ -16,9 +16,28 @@ export class RouterURL {
   }
 
   get path () {
-    return (this.mode === 'hash' && this.#url.hash)
-      ? this.#url.hash.slice(1).split("?").shift()
-      : this.#url.pathname.replace(this.base, '')
+    if (this.mode === 'hash' && this.#url.hash) {
+      return this.#url.hash.slice(1).split('?').shift() || '/'
+    }
+
+    const pathname = this.#url.pathname
+    const base = this.base && this.base !== '/'
+      ? this.base.replace(/\/$/, '')
+      : ''
+
+    if (!base) {
+      return pathname
+    }
+
+    if (pathname === base) {
+      return '/'
+    }
+
+    if (pathname.startsWith(base + '/')) {
+      return pathname.slice(base.length) || '/'
+    }
+
+    return pathname
   }
 
   get query () {

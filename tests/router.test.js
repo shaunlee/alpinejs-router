@@ -13,6 +13,18 @@ describe('router', () => {
     expect(r.match(new RouterURL('http:/localhost/xyz'))).toBe(false)
   })
 
+  test('match prefers more specific routes', () => {
+    const r = new Router()
+    r.add('/users/:id')
+    r.add('/users/add')
+    r.add('/:slug')
+    r.add('/:id(\\d+)')
+
+    expect(r.match(new RouterURL('http:/localhost/users/add'))).toStrictEqual({})
+    expect(r.match(new RouterURL('http:/localhost/123'))).toStrictEqual({id: '123'})
+    expect(r.match(new RouterURL('http:/localhost/hello'))).toStrictEqual({slug: 'hello'})
+  })
+
   test('is, not, notfound', () => {
     const r = new Router()
     r.add('/hello')
