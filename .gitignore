@@ -13,6 +13,7 @@ dist-ssr
 *.local
 yarn.lock
 bun.lockb
+bun.lock
 
 # Editor directories and files
 .vscode/*
