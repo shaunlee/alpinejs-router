@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@shaun/alpinejs-router examples</title>
-    <script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/es6.min.js" defer></script>
+    <script src="/dist/es6.min.js" defer></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body x-data x-init="$router.config({ mode: 'hash' })" class="fixed inset-0 flex flex-col text-gray-900">
+  <body x-data x-init="$router.config({ mode: 'hash', base: '/examples' })" class="fixed inset-0 flex flex-col text-gray-900">
     <header class="flex-none h-16 px-8 flex flex-row items-center border-b">
       <h1 class="text-2xl"><code>@shaun/alpinejs-router</code> examples</h1>
     </header>
@@ -28,8 +28,8 @@
       <div class="flex-1 flex flex-col">
         <div class="flex-1 relative">
           <main class="absolute w-full h-full overflow-y-scroll">
-            <template x-route="" template.preload="/home.html"></template>
-            <template x-route="/" template.preload="/home.html"></template>
+            <template x-route="" template.preload="/examples/home.html"></template>
+            <template x-route="/" template.preload="/examples/home.html"></template>
 
             <template x-route="/hello/:name">
               <div class="px-16 py-4">
@@ -49,7 +49,7 @@
               </div>
             </template>
 
-            <template x-route="/users" template="/users.html">
+            <template x-route="/users" template="/examples/users.html">
               <div class="px-16 py-4">
                 <div>
                   User profiles that are
@@ -115,6 +115,6 @@
         </footer>
       </div>
     </div>
-    <script src="/app.js"></script>
+    <script src="/examples/app.js"></script>
   </body>
 </html>

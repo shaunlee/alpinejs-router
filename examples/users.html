@@ -1,0 +1,13 @@
+<div class="px-16 py-4">
+  <div>
+    User profiles that are
+    <span x-show="$router.query.enabled === 'true'">enabled</span>
+    <span x-show="$router.query.enabled !== 'true'">disabled</span>
+  </div>
+  <div class="pt-16">Current page is `<code x-text="$router.query.page ?? 1"></code>`</div>
+  <ul class="pt-16 flex flex-row items-center space-x-8">
+    <li><a x-link :href="$router.resolve({ page: 1 })" class="hover:text-blue-600">Page1</a></li>
+    <li><a x-link :href="$router.resolve({ page: 2 })" class="hover:text-blue-600">Page2</a></li>
+    <li><a x-link :href="$router.resolve({ page: 100 })" class="hover:text-blue-600">Page100</a></li>
+  </ul>
+</div>
