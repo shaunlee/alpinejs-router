@@ -1,5 +1,5 @@
-import { Router } from '../src/router'
-import { RouterURL } from '../src/url'
+import { Router } from '../src/router.js'
+import { RouterURL } from '../src/url.js'
 
 describe('router', () => {
   test('match', () => {

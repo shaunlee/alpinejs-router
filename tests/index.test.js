@@ -1,4 +1,5 @@
-import { getRouteTemplateRoot, getTemplateRenderMode, isActivePath, shouldHandleLinkClick } from '../src/index'
+import { jest } from '@jest/globals'
+import { getRouteTemplateRoot, getTemplateRenderMode, isActivePath, shouldHandleLinkClick } from '../src/index.js'
 
 describe('router plugin helpers', () => {
   test('isActivePath only matches the same segment boundary', () => {

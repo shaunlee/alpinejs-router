@@ -3,7 +3,8 @@
  * @jest-environment-options {"url":"http://localhost/examples/"}
  */
 
-import registerRouterPlugin from '../src/index'
+import { jest } from '@jest/globals'
+import registerRouterPlugin from '../src/index.js'
 
 function stableEqual (left, right) {
   if (Object.is(left, right)) {

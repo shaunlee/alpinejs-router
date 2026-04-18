@@ -1,5 +1,5 @@
-import { RouterURL } from './url'
-import { URLPattern } from './pattern'
+import { RouterURL } from './url.js'
+import { URLPattern } from './pattern.js'
 
 export class Router {
   #patterns = {}

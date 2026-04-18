@@ -1,5 +1,5 @@
-import { RouterURL } from './url'
-import { Router } from './router'
+import { RouterURL } from './url.js'
+import { Router } from './router.js'
 
 export function isActivePath (targetPath, currentPath) {
   if (targetPath === '/') {

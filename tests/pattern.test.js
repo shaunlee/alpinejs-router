@@ -1,4 +1,4 @@
-import { URLPattern } from '../src/pattern'
+import { URLPattern } from '../src/pattern.js'
 
 describe('patterns', () => {
   test('build static path', () => {

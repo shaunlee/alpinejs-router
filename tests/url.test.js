@@ -1,4 +1,4 @@
-import { RouterURL } from '../src/url'
+import { RouterURL } from '../src/url.js'
 
 describe('URL', () => {
   describe('web mode', () => {
