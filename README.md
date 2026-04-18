@@ -19,6 +19,35 @@ npm install @shaun/alpinejs-router
 yarn add @shaun/alpinejs-router
 ```
 
+### bun
+
+```bash
+bun add @shaun/alpinejs-router
+```
+
+## Development
+
+```bash
+bun install
+```
+
+```bash
+bun run test --runInBand
+```
+
+```bash
+bun run build
+```
+
+Build artifacts are written to `dist/`:
+
+- `dist/module.esm.js`
+- `dist/module.cjs.js`
+- `dist/cdn.min.js`
+- `dist/es6.min.js`
+
+The build uses Vite library mode and keeps the published filenames stable.
+
 ### cdn
 
 ```html
@@ -155,6 +184,8 @@ The hash history mode is configured with `'hash'`:
 <body x-data x-init="$router.config({ mode: 'hash' })"></body>
 ```
 
+If you use a `base`, prefer a value without a trailing slash, e.g. `/prefix`.
+
 It uses a hash character (`#`) before the actual URL that is internally passed.
 Because this section of the URL is never sent to the server, it doesn't require any special treatment on the server level.
 It does however have a bad impact in SEO. If that's a concern for you, use the HTML5 history mode.
@@ -169,6 +200,8 @@ The HTML5 mode is configured with `'web'` and is the recommended mode:
 <body x-data></body>
 ```
 
+If you use a `base`, prefer a value without a trailing slash, e.g. `/prefix`.
+
 When using `'web'`, the URL will look "normal," e.g. `https://example.com/user/id`. Beautiful!
 
 Here comes a problem, though: Since our app is a single page client side app, without a proper server configuration,
@@ -180,6 +213,7 @@ If the URL doesn't match any static assets, it should serve the same `index.html
 ## Route directive
 
 Declare routes by creating a template tag with `x-route` attribute.
+Each route template should render exactly one root element.
 
 ```html
 <template x-route="/path/to/route">
@@ -191,6 +225,10 @@ Declare routes by creating a template tag with `x-route` attribute.
 <template x-route="/path/to/route" template="/path/to/template.html"></template>
 <!-- Preload the separate template file -->
 <template x-route="/path/to/route" template.preload="/path/to/template.html"></template>
+<!-- Use inline content as a fallback when the external template cannot be loaded -->
+<template x-route="/path/to/route" template="/path/to/template.html">
+  <div>Fallback template</div>
+</template>
 <!-- Relative paths -->
 <template x-route="/path/to/route" template="template.html"></template>
 <template x-route="/path/to/route" template="./template.html"></template>
@@ -214,11 +252,15 @@ Declare routes by creating a template tag with `x-route` attribute.
 <!-- The same as $router.replace -->
 <a x-link.replace href="/path/to/route">...</a>
 
-<!-- Activate the `active` and `exact-active` classes to router links -->
-<a x-link.activity">...</a>
+<!-- Activate the `active` and `exact-active` classes on router links -->
+<a x-link.activity href="/path/to/route">...</a>
 <!-- Custom active class and exact active class can be added by setting `active` and `exactActive` props to the `x-link.activity` directive -->
 <a x-link.activity="{ active: 'text-blue-500', exactActive: 'text-green-500' }">...</a>
 ```
+
+`x-link.activity` marks a link as active when the current path is exactly the same as the link path, or is a nested child route such as `/users/1` for `/users`.
+It does not treat `/users2` as active for `/users`.
+Modified clicks such as Ctrl/Cmd-click, middle click, `target="_blank"`, `download`, and external links keep the browser's native behavior.
 
 ## Magic $router
 
@@ -238,6 +280,8 @@ Declare routes by creating a template tag with `x-route` attribute.
 <span x-show="$router.loading">Separate template file is loading</span>
 ```
 
+`$router.loading` is useful when routes load external templates with `template` or `template.preload`.
+
 ### Methods
 
 ```html
@@ -253,13 +297,13 @@ Declare routes by creating a template tag with `x-route` attribute.
 <a x-link x-bind:href="$router.resolve({ page: 2 })">Page 2/10</a>
 
 <!-- Mode 'web' with prefix -->
-<body x-data x-init="$router.config({ base: '/prefix/' })">...</body>
+<body x-data x-init="$router.config({ base: '/prefix' })">...</body>
 <!-- Mode 'web' with prefix -->
-<body x-data x-init="$router.config({ mode: 'web', base: '/prefix/' })">...</body>
+<body x-data x-init="$router.config({ mode: 'web', base: '/prefix' })">...</body>
 <!-- Mode 'hash' with no prefix -->
 <body x-data x-init="$router.config({ mode: 'hash' })">...</body>
 <!-- Mode 'hash' with prefix -->
-<body x-data x-init="$router.config({ mode: 'hash', base: '/prefix/' })">...</body>
+<body x-data x-init="$router.config({ mode: 'hash', base: '/prefix' })">...</body>
 <!-- Do nothing by default to mode 'web' with no prefix -->
 <body x-data>...</body>
 
