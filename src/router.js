@@ -10,10 +10,7 @@ export class Router {
   add (route) {
     const pattern = this.#cache[route] ?? URLPattern.build(route)
     this.#cache[route] = pattern
-    this.#patterns = {
-      ...this.#patterns,
-      [route]: pattern
-    }
+    this.#patterns[route] = pattern
     this.#indexRoute(route, pattern)
   }
 
@@ -79,19 +76,16 @@ export class Router {
 
     const depth = Router.#segmentCount(route)
     const routes = this.#dynamicRoutes[depth] ?? []
-    const entry = [route, pattern]
-
-    let index = routes.findIndex(([current]) => Router.#compareRoutes(route, current) < 0)
-    if (index === -1) {
-      index = routes.length
-    }
+    const entry = [route, pattern, Router.#scoreRoute(route)]
 
     const existingIndex = routes.findIndex(([current]) => current === route)
     if (existingIndex > -1) {
       routes.splice(existingIndex, 1)
-      if (existingIndex < index) {
-        index -= 1
-      }
+    }
+
+    let index = routes.findIndex(current => Router.#compareRoutes(entry, current) < 0)
+    if (index === -1) {
+      index = routes.length
     }
 
     routes.splice(index, 0, entry)
@@ -102,9 +96,7 @@ export class Router {
     return this.#dynamicRoutes[Router.#segmentCount(path)] ?? []
   }
 
-  static #compareRoutes (left, right) {
-    const leftScores = Router.#scoreRoute(left)
-    const rightScores = Router.#scoreRoute(right)
+  static #compareRoutes ([left, , leftScores], [right, , rightScores]) {
     const length = Math.max(leftScores.length, rightScores.length)
 
     for (let i = 0; i < length; i += 1) {

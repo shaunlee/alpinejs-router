@@ -102,7 +102,7 @@ export default function (Alpine) {
     },
 
     resolve (query = {}) {
-      return getTargetURL(state.href).resolve(state.path, query).url
+      return getFreshURL(state.href).resolve(state.path, query).url
     },
 
     is (...paths) {
@@ -119,7 +119,19 @@ export default function (Alpine) {
   Alpine.$router = route
   Alpine.magic('router', () => route)
 
+  let cachedKey, cachedURL
+
+  // Shared read-only instance; callers that mutate it via resolve() must use getFreshURL
   function getTargetURL (href) {
+    const key = `${state.mode}|${state.base}|${href}`
+    if (key !== cachedKey) {
+      cachedKey = key
+      cachedURL = getFreshURL(href)
+    }
+    return cachedURL
+  }
+
+  function getFreshURL (href) {
     return new RouterURL(href, { mode: state.mode, base: state.base })
   }
 
@@ -314,7 +326,7 @@ export default function (Alpine) {
   })
 
   Alpine.directive('link', (el, { modifiers, expression }, { evaluate, effect, cleanup }) => {
-    const url = getTargetURL(el.href)
+    const url = getFreshURL(el.href)
     el.href = url.resolve(url.path, url.query, true).url
 
     function go (e) {
@@ -332,11 +344,13 @@ export default function (Alpine) {
       classes.active ??= 'active'
       classes.exactActive ??= 'exact-active'
 
-      effect(() => {
-        const [l, r] = [getTargetURL(el.href), getTargetURL(state.href)]
+      const linkPath = url.path
 
-        el.classList.toggle(classes.active, isActivePath(l.path, r.path))
-        el.classList.toggle(classes.exactActive, l.path === r.path)
+      effect(() => {
+        const currentPath = getTargetURL(state.href).path
+
+        el.classList.toggle(classes.active, isActivePath(linkPath, currentPath))
+        el.classList.toggle(classes.exactActive, linkPath === currentPath)
       })
     }
 

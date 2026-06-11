@@ -1,5 +1,6 @@
 export class RouterURL {
   #url
+  #path
 
   constructor(url, opts = {}) {
     this.#url = new URL(url)
@@ -9,6 +10,7 @@ export class RouterURL {
 
   set url (val) {
     this.#url = new URL(val)
+    this.#path = undefined
   }
 
   get url () {
@@ -16,6 +18,11 @@ export class RouterURL {
   }
 
   get path () {
+    this.#path ??= this.#resolvePath()
+    return this.#path
+  }
+
+  #resolvePath () {
     if (this.mode === 'hash' && this.#url.hash) {
       return this.#url.hash.slice(1).split('?').shift() || '/'
     }

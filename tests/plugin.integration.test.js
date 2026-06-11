@@ -232,6 +232,34 @@ describe('router plugin integration', () => {
     expect(link.classList.contains('active')).toBe(false)
   })
 
+  test('$router.resolve does not leak query params into later resolutions', async () => {
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    harness.Alpine.$router.push('/users')
+    await harness.flush()
+
+    expect(harness.Alpine.$router.resolve({ page: '2' })).toContain('page=2')
+    expect(harness.Alpine.$router.resolve({})).not.toContain('page=2')
+    expect(harness.Alpine.$router.path).toBe('/users')
+    expect(harness.Alpine.$router.is('/users')).toBe(true)
+  })
+
+  test('config changes are reflected immediately in route state', async () => {
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    expect(harness.Alpine.$router.path).toBe('/examples/')
+
+    harness.Alpine.$router.config({ base: '/examples' })
+    await harness.flush()
+
+    expect(harness.Alpine.$router.path).toBe('/')
+    expect(harness.Alpine.$router.is('/')).toBe(true)
+  })
+
   test('x-route logs an error and does not render when inline template has multiple roots', async () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
     const harness = createAlpineHarness()

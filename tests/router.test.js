@@ -25,6 +25,37 @@ describe('router', () => {
     expect(r.match(new RouterURL('http:/localhost/hello'))).toStrictEqual({slug: 'hello'})
   })
 
+  test('re-adding a route does not duplicate it or change priority', () => {
+    const r = new Router()
+    r.add('/users/:id')
+    r.add('/users/:id(\\d+)')
+    r.add('/users/:id')
+
+    expect(r.match(new RouterURL('http:/localhost/users/123'))).toStrictEqual({id: '123'})
+    expect(r.match(new RouterURL('http:/localhost/users/abc'))).toStrictEqual({id: 'abc'})
+  })
+
+  test('keeps priority order across many mixed routes', () => {
+    const r = new Router()
+    r.add('/:section/:page')
+    r.add('/docs/:page')
+    r.add('/:section(blog|news)/:page')
+    r.add('/docs/intro')
+
+    expect(r.match(new RouterURL('http:/localhost/docs/intro'))).toStrictEqual({})
+    expect(r.match(new RouterURL('http:/localhost/docs/setup'))).toStrictEqual({page: 'setup'})
+    expect(r.match(new RouterURL('http:/localhost/blog/hello'))).toStrictEqual({section: 'blog', page: 'hello'})
+    expect(r.match(new RouterURL('http:/localhost/shop/cart'))).toStrictEqual({section: 'shop', page: 'cart'})
+  })
+
+  test('equal-score routes are ordered by length', () => {
+    const r = new Router()
+    r.add('/:a')
+    r.add('/:longer')
+
+    expect(r.match(new RouterURL('http:/localhost/hello'))).toStrictEqual({longer: 'hello'})
+  })
+
   test('is, not, notfound', () => {
     const r = new Router()
     r.add('/hello')
