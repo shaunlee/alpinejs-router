@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "bench:router": "node bench/router.bench.js",
     "build": "vite build --mode module && vite build --mode cdn && vite build --mode cdn-es2015",
     "build:module": "vite build --mode module",
     "build:cdn": "vite build --mode cdn",

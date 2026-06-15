@@ -21,10 +21,12 @@ export class Router {
       return {}
     }
 
-    for (const [, pattern] of this.#getDynamicRoutes(path)) {
-      const found = URLPattern.match(path, pattern)
-      if (found) {
-        return found === true ? {} : found
+    for (const routes of this.#getDynamicRoutes(path)) {
+      for (const [, pattern] of routes) {
+        const found = URLPattern.match(path, pattern)
+        if (found) {
+          return found === true ? {} : found
+        }
       }
     }
     return false
@@ -63,9 +65,14 @@ export class Router {
       return false
     }
 
-    return this.#getDynamicRoutes(path).findIndex(
-      ([, pattern]) => URLPattern.is(path, pattern)
-    ) === -1
+    for (const routes of this.#getDynamicRoutes(path)) {
+      for (const [, pattern] of routes) {
+        if (URLPattern.is(path, pattern)) {
+          return false
+        }
+      }
+    }
+    return true
   }
 
   #indexRoute (route, pattern) {
@@ -74,8 +81,13 @@ export class Router {
       return
     }
 
-    const depth = Router.#segmentCount(route)
-    const routes = this.#dynamicRoutes[depth] ?? []
+    const segments = Router.#segments(route)
+    const depth = segments.length
+    const group = this.#dynamicRoutes[depth] ?? { static: new Map(), wildcard: [] }
+    const first = segments[0]
+    const routes = first.startsWith(':')
+      ? group.wildcard
+      : group.static.get(first) ?? []
     const entry = [route, pattern, Router.#scoreRoute(route)]
 
     const existingIndex = routes.findIndex(([current]) => current === route)
@@ -89,11 +101,29 @@ export class Router {
     }
 
     routes.splice(index, 0, entry)
-    this.#dynamicRoutes[depth] = routes
+    if (!first.startsWith(':')) {
+      group.static.set(first, routes)
+    }
+    this.#dynamicRoutes[depth] = group
   }
 
   #getDynamicRoutes (path) {
-    return this.#dynamicRoutes[Router.#segmentCount(path)] ?? []
+    const segments = Router.#segments(path)
+    const group = this.#dynamicRoutes[segments.length]
+    if (!group) {
+      return []
+    }
+
+    const routes = []
+    const first = segments[0]
+    const staticRoutes = group.static.get(first)
+    if (staticRoutes) {
+      routes.push(staticRoutes)
+    }
+    if (group.wildcard.length) {
+      routes.push(group.wildcard)
+    }
+    return routes
   }
 
   static #compareRoutes ([left, , leftScores], [right, , rightScores]) {
@@ -121,7 +151,7 @@ export class Router {
       })
   }
 
-  static #segmentCount (path) {
-    return path.split('/').filter(Boolean).length
+  static #segments (path) {
+    return path.split('/').filter(Boolean)
   }
 }

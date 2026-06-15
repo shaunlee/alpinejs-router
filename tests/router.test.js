@@ -56,6 +56,13 @@ describe('router', () => {
     expect(r.match(new RouterURL('http:/localhost/hello'))).toStrictEqual({longer: 'hello'})
   })
 
+  test('indexes dynamic routes with special static segment names', () => {
+    const r = new Router()
+    r.add('/__proto__/:id')
+
+    expect(r.match(new RouterURL('http:/localhost/__proto__/123'))).toStrictEqual({id: '123'})
+  })
+
   test('is, not, notfound', () => {
     const r = new Router()
     r.add('/hello')
