@@ -29,6 +29,14 @@ Static route matching and cached `is()` checks stay effectively constant-time. D
 npm install @shaun/alpinejs-router
 ```
 
+```js
+import Alpine from 'alpinejs'
+import router from '@shaun/alpinejs-router'
+
+Alpine.plugin(router)
+Alpine.start()
+```
+
 ### yarn
 
 ```bash
@@ -39,6 +47,19 @@ yarn add @shaun/alpinejs-router
 
 ```bash
 bun add @shaun/alpinejs-router
+```
+
+### CDN
+
+```html
+<script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/cdn.min.js" defer></script>
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+```
+
+```html
+<!-- older browsers -->
+<script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/es6.min.js" defer></script>
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 ```
 
 ## Development
@@ -68,18 +89,39 @@ Build artifacts are written to `dist/`:
 
 The build uses Vite library mode and keeps the published filenames stable.
 
-### cdn
-
-```html
-<script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/cdn.min.js" defer></script>
-```
-
-```html
-<!-- older browsers -->
-<script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/es6.min.js" defer></script>
-```
-
 ## Getting Started
+
+Here is a complete CDN example:
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  </head>
+  <body x-data>
+    <nav>
+      <a x-link href="/">Home</a>
+      <a x-link href="/hello/alpine">Hello</a>
+    </nav>
+
+    <template x-route="/">
+      <main>Home</main>
+    </template>
+
+    <template x-route="/hello/:name">
+      <main>Hello <span x-text="$router.params.name"></span></main>
+    </template>
+
+    <template x-route.notfound>
+      <main>Not found</main>
+    </template>
+  </body>
+</html>
+```
+
+Routes can also load inline or external templates:
 
 ```html
 <a x-link href="/hello/world">Hello World</a>
@@ -134,7 +176,7 @@ You can have multiple params in the same route, and they will map to correspondi
 
 In addition to `$router.params`, the `$router` magic also exposes other useful information such as `$router.query` (if there is a query in the URL), `$router.path`, etc.
 
-## Routes' Matching Syntax
+## Route Matching Syntax
 
 Most applications will use static routes like `/about` and dynamic routes like `/users/:userId` like we just saw in Dynamic Route Matching, but `@shaun/alpinejs-router` has much more to offer!
 
@@ -222,13 +264,13 @@ The HTML5 mode is configured with `'web'` and is the recommended mode:
 
 If you use a `base`, prefer a value without a trailing slash, e.g. `/prefix`.
 
-When using `'web'`, the URL will look "normal," e.g. `https://example.com/user/id`. Beautiful!
+When using `'web'`, the URL is a normal path, e.g. `https://example.com/user/id`.
 
-Here comes a problem, though: Since our app is a single page client side app, without a proper server configuration,
-the users will get a 404 error if they access `https://example.com/user/id` directly in their browser. Now that's ugly.
+Since this is a client-side router, direct browser requests to nested paths need server support.
+Without a fallback route, users will get a 404 error if they access `https://example.com/user/id` directly in their browser.
 
-Not to worry: To fix the issue, all you need to do is add a simple catch-all fallback route to your server.
-If the URL doesn't match any static assets, it should serve the same `index.html` page that your app lives in. Beautiful, again!
+To fix the issue, add a catch-all fallback route to your server.
+If the URL doesn't match any static assets, serve the same `index.html` page that your app lives in.
 
 ## Route directive
 
