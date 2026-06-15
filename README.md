@@ -3,7 +3,23 @@
 ![NPM](https://img.shields.io/npm/l/@shaun/alpinejs-router)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/shaunlee/alpinejs-router)
 
-Easy to use and flexible router for Alpine.js
+A lightweight client-side router for Alpine.js that adds declarative routes, link navigation, dynamic params, external templates, and hash or HTML5 history modes without turning your app into a larger framework.
+
+## Router benchmark
+
+Example result from `npm run bench:router` on Node.js v26.2.0:
+
+| Routes per type | Total routes | Case | ops/sec | us/op |
+| --- | ---: | --- | ---: | ---: |
+| 1000 | 4000 | match static | 6,253,583 | 0.160 |
+| 1000 | 4000 | match dynamic first | 1,271,974 | 0.786 |
+| 1000 | 4000 | match dynamic last | 1,287,858 | 0.776 |
+| 1000 | 4000 | match miss | 4,129,862 | 0.242 |
+| 1000 | 4000 | is cached dynamic | 3,610,343 | 0.277 |
+| 1000 | 4000 | notfound miss | 4,148,457 | 0.241 |
+| 1000 | 4000 | build routes | 69 | 14,416.050 |
+
+Static route matching and cached `is()` checks stay effectively constant-time. Dynamic `match()` and `notfound()` are indexed by first path segment, with wildcard-first dynamic routes used as a fallback.
 
 ## Installation
 
@@ -51,22 +67,6 @@ Build artifacts are written to `dist/`:
 - `dist/es6.min.js`
 
 The build uses Vite library mode and keeps the published filenames stable.
-
-### Router benchmark
-
-Example result from `npm run bench:router` on Node.js v26.2.0:
-
-| Routes per type | Total routes | Case | ops/sec | us/op |
-| --- | ---: | --- | ---: | ---: |
-| 1000 | 4000 | match static | 6,253,583 | 0.160 |
-| 1000 | 4000 | match dynamic first | 1,271,974 | 0.786 |
-| 1000 | 4000 | match dynamic last | 1,287,858 | 0.776 |
-| 1000 | 4000 | match miss | 4,129,862 | 0.242 |
-| 1000 | 4000 | is cached dynamic | 3,610,343 | 0.277 |
-| 1000 | 4000 | notfound miss | 4,148,457 | 0.241 |
-| 1000 | 4000 | build routes | 69 | 14,416.050 |
-
-Static route matching and cached `is()` checks stay effectively constant-time. Dynamic `match()` and `notfound()` are indexed by first path segment, with wildcard-first dynamic routes used as a fallback.
 
 ### cdn
 
