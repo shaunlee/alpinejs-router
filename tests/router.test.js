@@ -87,4 +87,35 @@ describe('router', () => {
     url = new RouterURL('http:/localhost/users/123/edit')
     expect(r.is(url, '/users/:id(\\d+)/edit')).toBe(true)
   })
+
+  test('add rejects an invalid parameter name with a clear Error', () => {
+    const r = new Router()
+
+    expect(() => r.add('/:user-id'))
+      .toThrow("Invalid route parameter name ':user-id' in route '/:user-id'")
+  })
+
+  test('a failed add leaves the router in a usable state', () => {
+    const r = new Router()
+    r.add('/users/:id')
+
+    expect(() => r.add('/posts/:post-id')).toThrow(Error)
+    expect(() => r.add('/:')).toThrow(Error)
+
+    expect(r.match(new RouterURL('http:/localhost/users/123'))).toStrictEqual({id: '123'})
+
+    r.add('/posts/:postId')
+    expect(r.match(new RouterURL('http:/localhost/posts/7'))).toStrictEqual({postId: '7'})
+    expect(r.match(new RouterURL('http:/localhost/users/123'))).toStrictEqual({id: '123'})
+  })
+
+  test('is and not propagate the clear Error for an invalid name', () => {
+    const r = new Router()
+    const url = new RouterURL('http:/localhost/users/123')
+
+    expect(() => r.is(url, '/:user-id'))
+      .toThrow("Invalid route parameter name ':user-id' in route '/:user-id'")
+    expect(() => r.not(url, '/:user-id'))
+      .toThrow("Invalid route parameter name ':user-id' in route '/:user-id'")
+  })
 })

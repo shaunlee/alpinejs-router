@@ -279,4 +279,235 @@ describe('router plugin integration', () => {
     expect(document.body.textContent).not.toContain('One')
     expect(consoleError).toHaveBeenCalledWith("Route '/bad' must render exactly one root element")
   })
+
+  test('$router.push rejects a lookalike cross-origin URL', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    harness.Alpine.$router.push('/users')
+    await harness.flush()
+
+    const before = window.location.href
+    const pushState = jest.spyOn(window.history, 'pushState')
+
+    expect(() => harness.Alpine.$router.push('http://localhost.evil.io/steal')).not.toThrow()
+
+    expect(consoleError).toHaveBeenCalledWith("Cannot push cross-origin URL 'http://localhost.evil.io/steal'")
+    expect(pushState).not.toHaveBeenCalled()
+    expect(window.location.href).toBe(before)
+    expect(harness.Alpine.$router.path).toBe('/users')
+  })
+
+  test('$router.push accepts a genuinely same-origin absolute URL', async () => {
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    harness.Alpine.$router.push('http://localhost/absolute?page=2')
+    await harness.flush()
+
+    expect(window.location.href).toBe('http://localhost/absolute?page=2')
+    expect(harness.Alpine.$router.path).toBe('/absolute')
+    expect(harness.Alpine.$router.query).toEqual({ page: '2' })
+  })
+
+  test('$router.push composes relative paths with base in web mode', async () => {
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    harness.Alpine.$router.config({ mode: 'web', base: '/app/' })
+    harness.Alpine.$router.push('/users')
+    await harness.flush()
+
+    expect(window.location.href).toBe('http://localhost/app/users')
+    expect(harness.Alpine.$router.path).toBe('/users')
+  })
+
+  test('$router.push composes relative paths in hash mode with and without base', async () => {
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    harness.Alpine.$router.config({ mode: 'hash', base: '/app' })
+    harness.Alpine.$router.push('/users')
+    await harness.flush()
+
+    expect(window.location.href).toBe('http://localhost/app#/users')
+    expect(harness.Alpine.$router.path).toBe('/users')
+
+    harness.Alpine.$router.config({ mode: 'hash' })
+    harness.Alpine.$router.push('/posts')
+    await harness.flush()
+
+    expect(window.location.href).toBe('http://localhost/#/posts')
+    expect(harness.Alpine.$router.path).toBe('/posts')
+  })
+
+  test('hashchange updates router state in hash mode', async () => {
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    harness.Alpine.$router.config({ mode: 'hash', base: '/app' })
+    window.history.replaceState({}, '', 'http://localhost/app#/old')
+    window.dispatchEvent(new window.Event('hashchange'))
+    await harness.flush()
+
+    expect(harness.Alpine.$router.path).toBe('/old')
+
+    window.location.hash = '#/new'
+    window.dispatchEvent(new window.Event('hashchange'))
+    await harness.flush()
+
+    expect(harness.Alpine.$router.path).toBe('/new')
+  })
+
+  test('template.preload names colliding with Object.prototype load normally', async () => {
+    global.fetch.mockImplementation(() => Promise.resolve(createFetchResponse('<div>Fetched</div>')))
+
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    const template = document.createElement('template')
+    template.setAttribute('template.preload', 'toString')
+    document.body.appendChild(template)
+
+    expect(() => mountDirective(harness, 'route', template, { modifiers: [], expression: '/users' })).not.toThrow()
+    await settle(harness)
+
+    expect(global.fetch).toHaveBeenCalledWith('toString')
+  })
+
+  test('template names colliding with Object.prototype are not falsely cached', async () => {
+    global.fetch.mockImplementation(() => Promise.resolve(createFetchResponse('<div>Fetched</div>')))
+
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    const template = document.createElement('template')
+    template.setAttribute('template', 'toString')
+    document.body.appendChild(template)
+
+    mountDirective(harness, 'route', template, { modifiers: [], expression: '/plain' })
+    await settle(harness)
+
+    harness.Alpine.$router.push('/plain')
+    await settle(harness)
+
+    expect(global.fetch).toHaveBeenCalledWith('toString')
+  })
+
+  test('an external template resolving to an empty body is fetched only once', async () => {
+    global.fetch.mockImplementation(() => Promise.resolve(createFetchResponse('')))
+
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    const template = document.createElement('template')
+    template.setAttribute('template', '/examples/empty.html')
+    document.body.appendChild(template)
+
+    mountDirective(harness, 'route', template, { modifiers: [], expression: '/empty' })
+    await settle(harness)
+
+    harness.Alpine.$router.push('/empty')
+    await settle(harness)
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+
+    harness.Alpine.$router.push('/other')
+    await settle(harness)
+    harness.Alpine.$router.push('/empty')
+    await settle(harness)
+
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+    expect(global.fetch).toHaveBeenCalledWith('/examples/empty.html')
+  })
+
+  test('config does not mutate the caller-supplied object', async () => {
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    const config = { mode: 'web', base: '/app/' }
+    harness.Alpine.$router.config(config)
+    await harness.flush()
+
+    expect(config.base).toBe('/app/')
+
+    harness.Alpine.$router.push('/users')
+    await harness.flush()
+    expect(window.location.href).toBe('http://localhost/app/users')
+
+    const frozen = Object.freeze({ mode: 'web', base: '/frozen/' })
+    expect(() => harness.Alpine.$router.config(frozen)).not.toThrow()
+    await harness.flush()
+
+    harness.Alpine.$router.push('/users')
+    await harness.flush()
+    expect(window.location.href).toBe('http://localhost/frozen/users')
+  })
+
+  test('x-route with an invalid expression logs an error and never matches', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    const invalid = document.createElement('template')
+    invalid.innerHTML = '<div>Invalid</div>'
+    document.body.appendChild(invalid)
+
+    expect(() => mountDirective(harness, 'route', invalid, {
+      modifiers: [],
+      expression: '/users/:user-id'
+    })).not.toThrow()
+    await harness.flush()
+
+    expect(consoleError).toHaveBeenCalledWith("Invalid route parameter name ':user-id' in route '/users/:user-id'")
+
+    harness.Alpine.$router.push('/users/123')
+    await harness.flush()
+
+    expect(invalid._x_currentIfEl).toBeUndefined()
+    expect(document.body.textContent).not.toContain('Invalid')
+  })
+
+  test('a valid x-route keeps working alongside an invalid one', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    const harness = createAlpineHarness()
+    registerRouterPlugin(harness.Alpine)
+    await harness.flush()
+
+    const invalid = document.createElement('template')
+    invalid.innerHTML = '<div>Invalid</div>'
+    const valid = document.createElement('template')
+    valid.innerHTML = '<div>Valid</div>'
+    document.body.append(invalid, valid)
+
+    mountDirective(harness, 'route', invalid, { modifiers: [], expression: '/users/:user-id' })
+    mountDirective(harness, 'route', valid, { modifiers: [], expression: '/users/:id' })
+    await harness.flush()
+
+    expect(valid._x_currentIfEl).toBeUndefined()
+
+    harness.Alpine.$router.push('/users/123')
+    await harness.flush()
+
+    expect(valid._x_currentIfEl).toBeDefined()
+    expect(document.body.textContent).toContain('Valid')
+    expect(document.body.textContent).not.toContain('Invalid')
+    expect(invalid._x_currentIfEl).toBeUndefined()
+
+    harness.Alpine.$router.push('/other')
+    await harness.flush()
+
+    expect(valid._x_currentIfEl).toBeUndefined()
+    expect(document.body.textContent).not.toContain('Valid')
+  })
 })

@@ -90,9 +90,11 @@ export default function (Alpine) {
       return state.loading
     },
     config (config = {}) {
-      if (config.mode !== 'hash' && config.base && config.base.endsWith('/')) config.base = config.base.slice(0, -1)
+      const base = config.mode !== 'hash' && config.base && config.base.endsWith('/')
+        ? config.base.slice(0, -1)
+        : config.base
       state.mode = config.mode ?? 'web'
-      state.base = config.base ?? ''
+      state.base = base ?? ''
     },
     push (...args) {
       return push(...args)
@@ -148,14 +150,26 @@ export default function (Alpine) {
     if (state.mode === 'web' && !state.base) parse()
   })
   window.addEventListener('popstate', () => state.href = location.href)
+  window.addEventListener('hashchange', () => state.href = location.href)
 
   function push (path, options = {}) {
-    if (!path.startsWith(location.origin)) {
-      if (state.mode === 'hash') {
-        path = location.origin + (state.base || '/') + '#' + path
-      } else {
-        path = location.origin + state.base + path
+    let target = null
+
+    try {
+      target = new URL(path)
+    } catch {
+      target = null
+    }
+
+    if (target) {
+      if (target.origin !== location.origin) {
+        console.error(`Cannot push cross-origin URL '${path}'`)
+        return
       }
+    } else if (state.mode === 'hash') {
+      path = location.origin + (state.base || '/') + '#' + path
+    } else {
+      path = location.origin + state.base + path
     }
     if (location.href !== path) {
       history[options.replace ? 'replaceState' : 'pushState']({}, '', path)
@@ -181,13 +195,20 @@ export default function (Alpine) {
     console.error(`Failed to load template '${tpl}' for route '${route}'`, error)
   }
 
-  const templateCaches = {}
-  const inLoadProgress = {}
+  const templateCaches = Object.create(null)
+  const inLoadProgress = Object.create(null)
   const inMakeProgress = new WeakSet()
 
   Alpine.directive('route', (el, { modifiers, expression }, { effect, cleanup }) => {
+    let invalidRoute = false
+
     if (!modifiers.includes('notfound')) {
-      router.add(expression)
+      try {
+        router.add(expression)
+      } catch (error) {
+        console.error(error.message)
+        invalidRoute = true
+      }
     }
 
     const load = url => {
@@ -278,14 +299,14 @@ export default function (Alpine) {
       const mode = getTemplateRenderMode({
         hasInlineTemplate: Boolean(el.content.firstElementChild),
         templateUrl: tpl,
-        hasCachedTemplate: Boolean(tpl && templateCaches[tpl]),
+        hasCachedTemplate: tpl in templateCaches,
         preloadFailed
       })
 
       if (mode === 'inline') {
         renderInline()
       } else if (mode === 'external') {
-        if (templateCaches[tpl]) {
+        if (tpl in templateCaches) {
           el.innerHTML = templateCaches[tpl]
           make()
         }
@@ -316,6 +337,11 @@ export default function (Alpine) {
 
     Alpine.nextTick(() => {
       effect(() => {
+        if (invalidRoute) {
+          hide()
+          return
+        }
+
         const target = getTargetURL(state.href)
         const found = modifiers.includes('notfound') ? router.notfound(target) : router.is(target, expression)
         found ? show() : hide()

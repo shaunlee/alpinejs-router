@@ -22,9 +22,13 @@ export class RouterURL {
     return this.#path
   }
 
+  #hashContent () {
+    return this.#url.hash.slice(1).split('#').shift()
+  }
+
   #resolvePath () {
     if (this.mode === 'hash' && this.#url.hash) {
-      return this.#url.hash.slice(1).split('?').shift() || '/'
+      return this.#hashContent().split('?').shift() || '/'
     }
 
     const pathname = this.#url.pathname
@@ -48,11 +52,11 @@ export class RouterURL {
   }
 
   get query () {
-    return Object.fromEntries(
-      new URLSearchParams(
-        this.#url.href.indexOf('?') > -1 ? this.#url.href.split('?').pop() : ''
-      )
-    )
+    const search = this.mode === 'hash' && this.#url.hash
+      ? this.#hashContent().split('?').slice(1).join('?')
+      : this.#url.search
+
+    return Object.fromEntries(new URLSearchParams(search))
   }
 
   resolve (path, params, replace = false) {

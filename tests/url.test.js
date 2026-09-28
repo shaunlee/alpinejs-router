@@ -27,6 +27,25 @@ describe('URL', () => {
       expect(u.query).toStrictEqual({a: '1', b: 'c'})
     })
 
+    test('parse query drops the fragment', () => {
+      const u = new RouterURL('http://localhost/users?tab=1&page=2#section')
+      expect(u.query).toStrictEqual({tab: '1', page: '2'})
+    })
+
+    test('parse query ignores a query inside the fragment', () => {
+      const u = new RouterURL('http://localhost/users#anchor?q=1')
+      expect(u.query).toStrictEqual({})
+    })
+
+    test('parse query with no query at all', () => {
+      expect(new RouterURL('http://localhost/hello/world').query).toStrictEqual({})
+    })
+
+    test('resolve url does not leak the fragment into the query', () => {
+      const u = new RouterURL('http://localhost/users?tab=1#section')
+      expect(u.resolve('/xyz', {}).url).toBe('http://localhost/xyz?tab=1')
+    })
+
     test('path is recomputed after the url changes', () => {
       const u = new RouterURL('http://localhost/hello/world')
       expect(u.path).toBe('/hello/world')
@@ -78,6 +97,26 @@ describe('URL', () => {
     test('parse query', () => {
       const u = new RouterURL('http://localhost/#/hello/world?a=1&b=c', { mode: 'hash' })
       expect(u.query).toStrictEqual({a: '1', b: 'c'})
+    })
+
+    test('parse query truncates at an inner hash', () => {
+      const u = new RouterURL('http://localhost/#/users?a=1#inner', { mode: 'hash' })
+      expect(u.query).toStrictEqual({a: '1'})
+    })
+
+    test('parse query falls back to search when there is no hash', () => {
+      const u = new RouterURL('http://localhost/users?a=1', { mode: 'hash' })
+      expect(u.query).toStrictEqual({a: '1'})
+    })
+
+    test('path truncates at an inner hash', () => {
+      const u = new RouterURL('http://localhost/#/users#inner', { mode: 'hash' })
+      expect(u.path).toBe('/users')
+    })
+
+    test('resolve url does not leak the fragment into the query', () => {
+      const u = new RouterURL('http://localhost/#/users?a=1#inner', { mode: 'hash' })
+      expect(u.resolve('/xyz', {}).url).toBe('http://localhost/#/xyz?a=1')
     })
 
     test('resolve url', () => {
