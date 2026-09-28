@@ -1,6 +1,6 @@
 {
   "name": "@shaun/alpinejs-router",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "A lightweight client-side router for Alpine.js that adds declarative routes, link navigation, dynamic params, external templates, and hash or HTML5 history modes without turning your app into a larger framework.",
   "type": "module",
   "main": "dist/module.cjs.js",
