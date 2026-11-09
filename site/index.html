@@ -23,10 +23,10 @@
 <meta name="twitter:description" content="A client-side router for Alpine.js: x-route templates, x-link anchors, dynamic params, external templates, hash or HTML5 history.">
 <meta name="twitter:image" content="https://shaunlee.github.io/alpinejs-router/images/social-preview.png">
 <meta name="twitter:image:alt" content="alpinejs-router: routes in your HTML, for Alpine.js. 3.2 kB gzipped, 6.25M static route matches a second, no dependencies besides Alpine.">
-<meta name="theme-color" content="#101624">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#F4F1E8">
+<meta name="color-scheme" content="light">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/schibsted-grotesk-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jetbrains-mono-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <script type="application/ld+json">
@@ -93,6 +93,8 @@
   </symbol>
 </svg>
 
+<a class="skip" href="#main">Skip to content</a>
+
 <header class="nav">
   <div class="container nav-inner">
     <a class="brand" href="./">alpinejs-router</a>
@@ -106,18 +108,17 @@
   </div>
 </header>
 
-<main>
+<main id="main">
 
 <section class="hero">
-  <div class="hero-grid" aria-hidden="true"></div>
   <div class="container hero-inner">
     <div class="hero-copy">
-      <p class="hero-eyebrow">A client-side router for Alpine.js</p>
-      <h1>Routes in your HTML.<br>Alpine renders them.</h1>
-      <p class="hero-lede">Add <code>x-route</code> templates and <code>x-link</code> anchors to the page you already have. Dynamic params, external templates, and hash or HTML5 history, in 3.2 kB gzipped.</p>
+      <p class="eyebrow">A client-side router for Alpine.js</p>
+      <h1>Routes in your HTML. <br>Alpine renders them.</h1>
+      <p class="hero-lede">Add <code>x-route</code> templates and <code>x-link</code> anchors to the page you already have. Dynamic params, external templates, and hash or HTML5 history, in 3.2&nbsp;kB gzipped.</p>
       <div class="chip">
         <code><span class="prompt">$</span> <span id="cmd-install">npm install @shaun/alpinejs-router</span></code>
-        <button class="copy" type="button" data-copy="cmd-install" aria-label="Copy the install command"><svg><use href="#copy"/></svg></button>
+        <button class="copy" type="button" data-copy="cmd-install" aria-label="Copy the install command"><svg aria-hidden="true"><use href="#copy"/></svg></button>
       </div>
       <div class="actions">
         <a class="btn btn-primary" href="#get-started">Get started</a>
@@ -125,27 +126,50 @@
       </div>
     </div>
 
-    <figure class="source" aria-label="A page with two links and three routes: home, /hello/:name and a not-found template">
-      <figcaption class="source-title">index.html</figcaption>
-<pre class="source-body"><span class="t">&lt;a</span> <span class="a">x-link</span> <span class="a">href</span>=<span class="s">"/"</span><span class="t">&gt;</span>Home<span class="t">&lt;/a&gt;</span>
-<span class="t">&lt;a</span> <span class="a">x-link</span> <span class="a">href</span>=<span class="s">"/hello/alpine"</span><span class="t">&gt;</span>Hello<span class="t">&lt;/a&gt;</span>
-
-<span class="t">&lt;template</span> <span class="a">x-route</span>=<span class="s">"/"</span><span class="t">&gt;</span>
-  <span class="t">&lt;main&gt;</span>Home<span class="t">&lt;/main&gt;</span>
-<span class="t">&lt;/template&gt;</span>
-
-<span class="hl"><span class="t">&lt;template</span> <span class="a">x-route</span>=<span class="s">"/hello/:name"</span><span class="t">&gt;</span></span>
-  <span class="t">&lt;main&gt;</span>Hello <span class="t">&lt;b</span> <span class="a">x-text</span>=<span class="s">"$router.params.name"</span><span class="t">&gt;&lt;/b&gt;&lt;/main&gt;</span>
-<span class="t">&lt;/template&gt;</span>
-
-<span class="t">&lt;template</span> <span class="a">x-route.notfound</span><span class="t">&gt;</span>
-  <span class="t">&lt;main&gt;</span>Not found<span class="t">&lt;/main&gt;</span>
-<span class="t">&lt;/template&gt;</span></pre>
+    <figure class="trailmap" role="img" aria-label="A trail map of routes. A trail starts at /, reaches a junction with a signpost pointing to /hello/alpine and /users/42, and branches to /hello/:name, /users/:id(\d+) and /about.">
+      <svg viewBox="0 0 600 440" aria-hidden="true">
+        <g class="ridge" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M318 112 372 62l22 20 46-54 50 56 22-20 58 50"/>
+          <path d="M428 42l12 10 8-8 6 10M372 62l8 10 7-4"/>
+        </g>
+        <g class="trees" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M70 262l-9 16h5l-8 13h24l-8-13h5zM70 291v7"/>
+          <path d="M92 270l-7 13h4l-6 10h18l-6-10h4zM92 293v6"/>
+          <path d="M540 300l-9 16h5l-8 13h24l-8-13h5zM540 329v7"/>
+          <path d="M562 312l-7 13h4l-6 10h18l-6-10h4zM562 335v6"/>
+        </g>
+        <g class="trail" fill="none">
+          <path d="M120 396c40-30 70-40 110-60s70-50 104-76"/>
+          <path d="M334 260c-40-10-80 0-120-20s-60-50-92-70"/>
+          <path d="M334 260c50 4 90-12 130-26s52-16 70-18"/>
+          <path d="M334 260c10 30 20 50 50 70s40 30 56 40"/>
+        </g>
+        <g class="post">
+          <path class="pole" d="M334 260V118"/>
+          <path class="blade" d="M334 132H186l-14 14 14 14h148z"/>
+          <path class="blade" d="M334 170h112l14 14-14 14H334z"/>
+          <text x="194" y="151">/hello/alpine</text>
+          <text x="346" y="189">/users/42</text>
+        </g>
+        <g class="points">
+          <circle cx="120" cy="396" r="7"/>
+          <circle cx="122" cy="170" r="7"/>
+          <circle cx="534" cy="216" r="7"/>
+          <circle cx="440" cy="370" r="7"/>
+          <circle class="junction" cx="334" cy="260" r="8"/>
+        </g>
+        <g class="labels">
+          <text x="138" y="401">/</text>
+          <text x="108" y="175" text-anchor="end">/hello/:name</text>
+          <text x="590" y="252" text-anchor="end">/users/:id(\d+)</text>
+          <text x="410" y="402">/about</text>
+        </g>
+      </svg>
     </figure>
   </div>
   <div class="container">
     <dl class="stats">
-      <div><dt class="accent">3.2 kB</dt><dd>minified and gzipped</dd></div>
+      <div><dt>3.2 kB</dt><dd>minified and gzipped</dd></div>
       <div><dt>6.25M</dt><dd>static route matches a second</dd></div>
       <div><dt>0</dt><dd>dependencies besides Alpine.js</dd></div>
       <div><dt>2</dt><dd>history modes, hash and HTML5</dd></div>
@@ -154,49 +178,55 @@
 </section>
 
 <section class="section" id="features">
-  <div class="container wide">
-    <header class="section-head center">
+  <div class="container">
+    <header class="section-head">
       <p class="eyebrow">Features</p>
       <h2>Routing for pages that <br>already use Alpine.</h2>
       <p class="sub">One plugin, two directives, one magic. MIT licensed.</p>
     </header>
-    <ul class="features">
-      <li class="card">
-        <svg class="icon" viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="36" height="34" rx="3.5"/><path d="M4 13h36"/><path d="m15 21-5 5 5 5M29 21l5 5-5 5M24.5 19.5l-5 13"/></g></svg>
+    <ol class="features">
+      <li class="panel">
+        <span class="badge" aria-hidden="true">01</span>
+        <svg class="icon" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5 12l12-5 14 5 12-5v30l-12 5-14-5-12 5z"/><path d="M17 7v30M31 12v30"/><path d="M11 32c4-2 5-7 10-8s8-6 12-10" stroke-dasharray="2.4 2.6" stroke-linecap="round"/><circle cx="11" cy="32" r="1.8"/></g><circle cx="34" cy="13" r="2.6" fill="#D7263D"/></svg>
         <h3>Routes in markup</h3>
         <p>Each route is a <code>&lt;template x-route&gt;</code> with one root element. It renders when the path matches and is removed when it stops matching.</p>
       </li>
-      <li class="card">
-        <svg class="icon" viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18.5 25.5a7 7 0 0 0 10 0l6-6a7 7 0 0 0-10-10l-2 2"/><path d="M25.5 18.5a7 7 0 0 0-10 0l-6 6a7 7 0 0 0 10 10l2-2"/></g></svg>
+      <li class="panel">
+        <span class="badge" aria-hidden="true">02</span>
+        <svg class="icon" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M24 6v37M18 43h12"/><path d="M24 10h14l5 5-5 5H24z" fill="#F2C200"/><path d="M24 24H11l-5 5 5 5h13z"/></g></svg>
         <h3>Link navigation</h3>
         <p><code>x-link</code> pushes, <code>x-link.replace</code> replaces, and <code>.activity</code> sets active classes. Ctrl-click, new tabs and external links behave as usual.</p>
       </li>
-      <li class="card">
-        <svg class="icon" viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h8M18 22h8M32 22h8"/><circle cx="15" cy="22" r="3"/><circle cx="29" cy="22" r="3"/><path d="M12 12c-3 0-4 2-4 4v1M32 12c3 0 4 2 4 4v1M12 32c-3 0-4-2-4-4v-1M32 32c3 0 4-2 4-4v-1"/></g></svg>
+      <li class="panel">
+        <span class="badge" aria-hidden="true">03</span>
+        <svg class="icon" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M3 40l14-22 7 10 7-14 14 26"/><path d="M13 24l4 3 3-3M27 21l4 3 3-4"/></g></svg>
         <h3>Dynamic params</h3>
         <p><code>/users/:id</code> exposes <code>$router.params.id</code>. Add a regex to tell routes apart: <code>/:orderId(\d+)</code> only matches digits.</p>
       </li>
-      <li class="card">
-        <svg class="icon" viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 40H7a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h15l7 7v8"/><path d="M22 3v7h7"/><path d="M33 22v14M27.5 30.5 33 36l5.5-5.5"/></g></svg>
+      <li class="panel">
+        <span class="badge" aria-hidden="true">04</span>
+        <svg class="icon" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M3 11l42-7"/><path d="M24 8v8"/><rect x="12" y="16" width="24" height="22" rx="6"/><path d="M16 22h7v7h-7zM25 22h7v7h-7z"/></g></svg>
         <h3>External templates</h3>
         <p>Point a route at <code>template="/user.html"</code> to fetch it on first visit, or <code>template.preload</code> to fetch it at start. Inline content is the fallback.</p>
       </li>
-      <li class="card">
-        <svg class="icon" viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="38" height="11" rx="5.5"/><rect x="3" y="26" width="38" height="11" rx="5.5"/></g><g fill="currentColor" font-family="JetBrains Mono, monospace" font-size="7.4" font-weight="600" text-anchor="middle"><text x="22" y="17.2">/users</text><text x="22" y="34.2">#/users</text></g></svg>
+      <li class="panel">
+        <span class="badge" aria-hidden="true">05</span>
+        <svg class="icon" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M14 5l-8 14h5L5 30h18l-6-11h5zM14 30v8"/><path d="M33 13l-6 11h4l-5 9h14l-5-9h4zM33 33v5"/><path d="M20 45c4-4 12-2 16-6s6-4 8-4" stroke-dasharray="2.4 2.6"/></g></svg>
         <h3>Hash or HTML5 history</h3>
         <p>Normal paths by default, or <code>#/</code> URLs that need nothing from the server. Either mode can run under a <code>base</code> such as <code>/app</code>.</p>
       </li>
-      <li class="card">
-        <svg class="icon" viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5c-4 0-5 2-5 5v6c0 3-1.5 5-4.5 6 3 1 4.5 3 4.5 6v6c0 3 1 5 5 5M30 5c4 0 5 2 5 5v6c0 3 1.5 5 4.5 6-3 1-4.5 3-4.5 6v6c0 3-1 5-5 5"/></g><circle cx="16" cy="22" r="1.8" fill="currentColor"/><circle cx="22" cy="22" r="1.8" fill="currentColor"/><circle cx="28" cy="22" r="1.8" fill="currentColor"/></svg>
+      <li class="panel">
+        <span class="badge" aria-hidden="true">06</span>
+        <svg class="icon" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M7 40c-2-10 2-26 15-29 12-3 20 6 20 17 0 5 1 9 2 12z"/><path d="M4 40h42M10 40l-2-4M14 40l1-4M37 40l-1-4M41 40l2-4"/></g><rect x="17" y="20" width="15" height="12" fill="#F4F1E8" stroke="currentColor" stroke-width="1.4"/><rect x="17" y="24" width="15" height="4" fill="#D7263D"/></svg>
         <h3>The <code class="h">$router</code> magic</h3>
         <p>Read <code>path</code>, <code>query</code>, <code>params</code> and <code>loading</code>. Call <code>push</code>, <code>replace</code>, <code>resolve</code>, <code>is</code> and <code>not</code> from any expression.</p>
       </li>
-    </ul>
+    </ol>
   </div>
 </section>
 
 <section class="section" id="demo">
-  <div class="container wide">
+  <div class="container">
     <header class="section-head">
       <p class="eyebrow">Live demo</p>
       <h2>Click around. This is the router.</h2>
@@ -208,9 +238,9 @@
           <span class="dots3" aria-hidden="true"><i></i><i></i><i></i></span>
           <output class="address" id="demo-url" aria-label="Address of the demo frame">example.com/#/</output>
         </div>
-        <iframe src="demo/" title="Live demo of alpinejs-router" loading="lazy"></iframe>
+        <iframe src="demo/index.html" title="Live demo of alpinejs-router" loading="lazy"></iframe>
       </div>
-<pre class="demo-source" aria-label="Excerpt of the demo source"><span class="c">&lt;!-- three of the six routes in the frame --&gt;</span>
+<pre class="code demo-source" aria-label="Excerpt of the demo source"><span class="c">&lt;!-- three of the six routes in the frame --&gt;</span>
 <span class="t">&lt;body</span> <span class="a">x-data</span>
       <span class="a">x-init</span>=<span class="s">"$router.config({ mode: 'hash' })"</span><span class="t">&gt;</span>
 
@@ -233,7 +263,7 @@
 </section>
 
 <section class="section" id="performance">
-  <div class="container narrow">
+  <div class="container">
     <header class="section-head">
       <p class="eyebrow">Performance</p>
       <h2>6.25M static matches a second. <br>1.27M dynamic ones.</h2>
@@ -258,15 +288,14 @@
 </section>
 
 <section class="section" id="modes">
-  <div class="container narrow">
+  <div class="container">
     <header class="section-head">
       <p class="eyebrow">History modes</p>
       <h2>Pick the URL shape you want.</h2>
     </header>
     <div class="modes-wrap">
       <table class="modes">
-        <colgroup><col style="width:21%"><col style="width:32%"><col style="width:22%"><col></colgroup>
-        <thead><tr><th scope="col"><code>mode</code></th><th scope="col">URL</th><th scope="col">Server setup</th><th scope="col">Search engines</th></tr></thead>
+        <thead><tr><th scope="col">mode</th><th scope="col">URL</th><th scope="col">Server setup</th><th scope="col">Search engines</th></tr></thead>
         <tbody>
           <tr class="default"><th scope="row"><code>web (default)</code></th><td><code>/users/42</code></td><td>fallback to index.html</td><td>see each path as a page</td></tr>
           <tr><th scope="row"><code>hash</code></th><td><code>/#/users/42</code></td><td>none</td><td>see one page</td></tr>
@@ -278,8 +307,8 @@
 </section>
 
 <section class="section" id="get-started">
-  <div class="container narrow">
-    <header class="section-head center">
+  <div class="container">
+    <header class="section-head">
       <p class="eyebrow">Get started</p>
       <h2>Two script tags, or one install.</h2>
     </header>
@@ -291,7 +320,7 @@
         <button role="tab" type="button" id="tab-yarn" aria-controls="pane-yarn" aria-selected="false" tabindex="-1">yarn</button>
         <button role="tab" type="button" id="tab-bun" aria-controls="pane-bun" aria-selected="false" tabindex="-1">bun</button>
       </div>
-      <button class="copy copy-solid" type="button" data-copy-active aria-label="Copy the code"><svg><use href="#copy"/></svg></button>
+      <button class="copy copy-text" type="button" data-copy-active><svg aria-hidden="true"><use href="#copy"/></svg><span>Copy</span></button>
       <div class="pane" role="tabpanel" id="pane-cdn" aria-labelledby="tab-cdn">
 <pre><code data-cmd>&lt;script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/cdn.min.js" defer&gt;&lt;/script&gt;
 &lt;script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer&gt;&lt;/script&gt;</code></pre>
@@ -312,8 +341,11 @@
     <p class="panel-note" data-note="pane-bun" hidden>Alpine.js 3 is a peer dependency. Register the plugin before <code>Alpine.start()</code>, as below.</p>
 
     <div class="pair">
-      <div class="card card-flat">
-        <h3>With a bundler</h3>
+      <div class="card">
+        <div class="card-head">
+          <svg class="card-icon" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 40l14-22 7 10 7-14 14 26"/></g></svg>
+          <h3>With a bundler</h3>
+        </div>
 <pre class="snippet" aria-label="Import Alpine and the router, register the plugin, then start Alpine"><span class="k">import</span> Alpine <span class="k">from</span> <span class="s">'alpinejs'</span>
 <span class="k">import</span> router <span class="k">from</span> <span class="s">'@shaun/alpinejs-router'</span>
 
@@ -321,22 +353,30 @@ Alpine.plugin(router)
 Alpine.start()</pre>
         <a class="link" href="https://github.com/shaunlee/alpinejs-router#getting-started">A complete page <span aria-hidden="true">→</span></a>
       </div>
-      <div class="card card-flat">
-        <h3>When something else fits better</h3>
+      <div class="card">
+        <div class="card-head">
+          <svg class="card-icon" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M24 6v37M18 43h12"/><path d="M24 10h14l5 5-5 5H24zM24 24H11l-5 5 5 5h13z"/></g></svg>
+          <h3>When something else fits better</h3>
+        </div>
         <p>Use a framework router, such as Vue Router, if you need:</p>
-        <ul class="dots">
+        <ul class="list">
           <li>Guards that can cancel a navigation</li>
           <li>Routes defined in JavaScript, not markup</li>
           <li>Server-side rendering</li>
         </ul>
       </div>
     </div>
+  </div>
+</section>
 
+<section class="trailhead">
+  <div class="container">
     <div class="cta">
+      <svg class="cta-icon" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><circle cx="25" cy="7" r="3.5"/><path d="M24 13l-3 13 6 6 2 12M21 26l-5 18M24 15l7 7 5-2M37 18l4 26"/><path d="M19 13l-6 3 2 9 5-1z"/><path d="M4 45l10-7 8 2 9-6 14 11"/></g></svg>
       <h2>Add routing to the Alpine page you already have.</h2>
       <div class="actions">
         <a class="btn btn-primary" href="#get-started">Get started</a>
-        <a class="btn btn-outline" href="https://github.com/shaunlee/alpinejs-router">View on GitHub</a>
+        <a class="btn btn-secondary" href="https://github.com/shaunlee/alpinejs-router">View on GitHub</a>
       </div>
     </div>
   </div>
@@ -345,7 +385,7 @@ Alpine.start()</pre>
 </main>
 
 <footer class="footer">
-  <div class="container narrow"><div class="footer-inner">
+  <div class="container"><div class="footer-inner">
     <div class="footer-brand">
       <a class="brand" href="./">alpinejs-router</a>
       <p>MIT licensed</p>
@@ -362,8 +402,13 @@ Alpine.start()</pre>
 (() => {
   const copy = async (btn, text) => {
     try { await navigator.clipboard.writeText(text); } catch { return; }
+    const label = btn.querySelector('span');
     btn.classList.add('done');
-    setTimeout(() => btn.classList.remove('done'), 1200);
+    if (label) label.textContent = 'Copied';
+    setTimeout(() => {
+      btn.classList.remove('done');
+      if (label) label.textContent = 'Copy';
+    }, 1200);
   };
   // The leading "$ " is presentation only; copy the commands themselves.
   const commands = el => el.textContent.split('\n').map(l => l.replace(/^\$ /, '')).join('\n').trim();
@@ -391,9 +436,12 @@ Alpine.start()</pre>
     copy(e.currentTarget, commands(panel.querySelector('[role=tabpanel]:not([hidden]) [data-cmd]'))));
 
   // The demo frame reports its hash after every route change; mirror it in the fake address bar.
+  // Opened from disk, the origin is opaque and cannot be compared, so rely on the source frame alone.
   const address = document.getElementById('demo-url');
+  const frame = document.querySelector('#demo iframe');
   window.addEventListener('message', e => {
-    if (e.origin === location.origin && e.data && e.data.demo === 'alpinejs-router') {
+    const trusted = e.source === frame.contentWindow && (location.protocol === 'file:' || e.origin === location.origin);
+    if (trusted && e.data && e.data.demo === 'alpinejs-router') {
       address.value = 'example.com/' + e.data.url;
     }
   });

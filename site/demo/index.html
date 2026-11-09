@@ -5,49 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Live demo · alpinejs-router</title>
 <meta name="robots" content="noindex">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<!-- Both files are copied in by the Pages workflow: the router from this
-     repository's build, Alpine from npm. The router must load first. -->
-<script src="router.min.js" defer></script>
-<script src="alpine.min.js" defer></script>
 <style>
-@font-face { font-family: "Inter"; src: url("../fonts/inter-latin-var.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Schibsted Grotesk"; src: url("../fonts/schibsted-grotesk-latin-var.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
 @font-face { font-family: "JetBrains Mono"; src: url("../fonts/jetbrains-mono-latin-var.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
 body {
   display: flex; flex-direction: column;
-  background: #141b2b; color: #d3d8e2;
-  font: 400 15px/1.5 "Inter", system-ui, sans-serif;
+  background: #f4f1e8; color: #14213d;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 16px; line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 [x-cloak] { display: none !important; }
 code, pre { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-variant-ligatures: none; }
 a { color: inherit; text-decoration: none; }
-nav { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 12px; border-bottom: 1px solid #232c40; }
-nav a { padding: 4px 10px; border-radius: 6px; font-size: 14px; color: #a1a9b8; }
-nav a:hover { color: #f4f6fa; background: rgba(255,255,255,.05); }
-nav a.active { color: #77c1d2; }
-nav a.exact-active { color: #0b1220; background: #77c1d2; }
-main { flex: 1; padding: 16px 18px; }
-h1 { margin: 0 0 6px; color: #f4f6fa; font-size: 20px; letter-spacing: -0.01em; }
-p { margin: 0; color: #a1a9b8; font-size: 14px; }
+:focus-visible { outline: 2px solid #256b78; outline-offset: 2px; }
+nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; border-bottom: 1.5px solid #14213d; }
+nav a { padding: 5px 12px; border: 1.5px solid transparent; border-radius: 4px; font-size: 15px; font-weight: 600; color: #256b78; }
+nav a:hover { border-color: #14213d; }
+nav a.active { text-decoration: underline; text-underline-offset: 4px; }
+nav a.exact-active { color: #14213d; background: #f2c200; border-color: #14213d; text-decoration: none; }
+main { flex: 1; padding: 20px 22px; }
+h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.1; font-weight: 800; letter-spacing: -0.025em; }
+p { margin: 0; color: #4f5768; font-size: 15.5px; }
 p + p { margin-top: 6px; }
-p code, h1 code { font-size: 13px; color: #d3d8e2; background: rgba(255,255,255,.06); border-radius: 4px; padding: 1px 4px; }
-.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+p code { font-size: 13.5px; color: #14213d; border: 1px solid rgba(20,33,61,.45); border-radius: 3px; padding: 0 4px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .row a, .row button {
-  font: inherit; font-size: 13.5px; color: #77c1d2; background: none; cursor: pointer;
-  border: 1px solid rgba(119,193,210,.45); border-radius: 6px; padding: 3px 10px;
+  font: inherit; font-size: 14px; font-weight: 600; color: #14213d; background: none; cursor: pointer;
+  border: 1.5px solid #14213d; border-radius: 4px; padding: 5px 12px;
 }
-.row a:hover, .row button:hover { background: rgba(119,193,210,.1); }
-.loading { color: #77c1d2; font-size: 14px; }
-.state { margin: 0; padding: 9px 18px 11px; border-top: 1px solid #232c40; background: #10161f; font-size: 12.5px; line-height: 19px; color: #a1a9b8; white-space: pre-wrap; word-break: break-all; }
-.state b { color: #6fd3ea; font-weight: 400; }
+.row a:hover, .row button:hover { background: rgba(20,33,61,.07); }
+.loading { color: #256b78; font-size: 15px; }
+.notice { margin: 16px 22px 0; padding: 12px 14px; border: 1.5px solid #14213d; border-radius: 4px; background: #f7e7a1; font-size: 14.5px; }
+.notice code { font-size: 13px; }
+.state { display: grid; grid-template-columns: auto 1fr 1fr; margin: 0; border-top: 1.5px solid #14213d; font-size: 13px; line-height: 1.4; }
+.state > span { padding: 10px 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.state > span + span { border-left: 1.5px solid #14213d; }
+.state b { color: #256b78; font-weight: 600; margin-right: 8px; }
+@media (max-width: 480px) { .state { grid-template-columns: 1fr; } .state > span + span { border-left: 0; border-top: 1px solid #cfc8b6; } }
 </style>
 </head>
 <body x-data x-init="$router.config({ mode: 'hash', base: location.pathname })"
-      x-effect="$router.path, $router.query, parent.postMessage({ demo: 'alpinejs-router', url: location.hash || '#/' }, location.origin)">
+      x-effect="$router.path, $router.query, parent.postMessage({ demo: 'alpinejs-router', url: location.hash || '#/' }, location.protocol === 'file:' ? '*' : location.origin)">
 
 <nav>
   <a x-link.activity href="/">Home</a>
@@ -112,9 +114,32 @@ p code, h1 code { font-size: 13px; color: #d3d8e2; background: rgba(255,255,255,
   <p class="loading" x-show="$router.loading" x-cloak>Loading template…</p>
 </main>
 
-<pre class="state" aria-live="polite"><b>path</b>   <span x-text="$router.path"></span>
-<b>params</b> <span x-text="JSON.stringify($router.params)"></span>
-<b>query</b>  <span x-text="JSON.stringify($router.query)"></span></pre>
+<div class="state" aria-live="polite">
+  <span><b>path</b><code x-text="$router.path"></code></span>
+  <span><b>params</b><code x-text="JSON.stringify($router.params)"></code></span>
+  <span><b>query</b><code x-text="JSON.stringify($router.query)"></code></span>
+</div>
 
+<p class="notice" id="file-notice" hidden>Opened from disk, so the browser blocks <code>about.html</code> and some navigation. Serve the folder over http to try every route, for example <code>python3 -m http.server -d site</code>.</p>
+
+<script>
+// The Pages workflow copies router.min.js (this commit's build) and
+// alpine.min.js next to this file. A local preview of site/ has neither, so
+// fall back to the published builds on unpkg. The router has to run before
+// Alpine starts, so load them one after the other.
+(() => {
+  const load = (src, fallback) => new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = () => fallback ? load(fallback).then(resolve, reject) : reject(new Error('Cannot load ' + src));
+    document.body.append(s);
+  });
+  if (location.protocol === 'file:') document.getElementById('file-notice').hidden = false;
+  load('router.min.js', 'https://unpkg.com/@shaun/alpinejs-router@1/dist/cdn.min.js')
+    .then(() => load('alpine.min.js', 'https://unpkg.com/alpinejs@3/dist/cdn.min.js'))
+    .catch(error => console.error(error));
+})();
+</script>
 </body>
 </html>
