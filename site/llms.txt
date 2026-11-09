@@ -1,0 +1,47 @@
+# alpinejs-router
+
+> alpinejs-router (npm: `@shaun/alpinejs-router`) is a lightweight client-side router plugin for Alpine.js 3. Routes are declared in HTML: each route is a `<template x-route="/path">`, links are `<a x-link href="/path">`, and route state is read through the `$router` magic.
+
+It supports dynamic params (`/users/:id`, exposed as `$router.params.id`), custom regex params (`/:orderId(\d+)`), a not-found template (`x-route.notfound`), external route templates fetched on demand or preloaded (`template="/user.html"`, `template.preload`), and hash or HTML5 history modes with an optional base path (`$router.config({ mode: 'hash', base: '/app' })`). The minified CDN build is about 3.2 kB gzipped and has no dependencies besides Alpine.js. MIT licensed.
+
+It does not provide navigation guards, routes defined in JavaScript, or server-side rendering. In HTML5 (`web`) mode the server must serve `index.html` for unknown paths.
+
+Quick start (CDN; load the router before Alpine):
+
+```html
+<script src="https://unpkg.com/@shaun/alpinejs-router@1.x.x/dist/cdn.min.js" defer></script>
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<body x-data>
+  <a x-link href="/hello/alpine">Hello</a>
+  <template x-route="/hello/:name">
+    <main>Hello <span x-text="$router.params.name"></span></main>
+  </template>
+  <template x-route.notfound><main>Not found</main></template>
+</body>
+```
+
+With a bundler:
+
+```js
+import Alpine from 'alpinejs'
+import router from '@shaun/alpinejs-router'
+
+Alpine.plugin(router)
+Alpine.start()
+```
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/shaunlee/alpinejs-router/main/README.md): installation, getting started, dynamic params, route matching syntax, programmatic navigation, history modes, the x-route and x-link directives, the $router magic, and benchmark results
+
+## Project
+
+- [GitHub repository](https://github.com/shaunlee/alpinejs-router)
+- [Releases](https://github.com/shaunlee/alpinejs-router/releases)
+- [npm package](https://www.npmjs.com/package/@shaun/alpinejs-router)
+
+## Optional
+
+- [Examples app](https://github.com/shaunlee/alpinejs-router/tree/main/examples): hash mode, regex params, query strings, external templates, and $router inside a custom directive
+- [Live demo source](https://raw.githubusercontent.com/shaunlee/alpinejs-router/main/site/demo/index.html)

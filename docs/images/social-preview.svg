@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="alpinejs-router: routes in your HTML, for Alpine.js">
+  <rect width="1280" height="640" fill="#101624"/>
+
+  <g font-family="Menlo, monospace">
+    <rect x="80" y="92" width="56" height="6" fill="#77c1d2"/>
+
+    <text x="1200" y="104" text-anchor="end" font-size="19" fill="#a1a9b8">MIT · Alpine.js 3 plugin</text>
+
+    <text x="80" y="204" font-size="78" font-weight="bold" fill="#f4f6fa">alpinejs-router</text>
+    <text x="80" y="262" font-size="29" fill="#a1a9b8">routes in your HTML, for Alpine.js</text>
+
+    <line x1="435" y1="380" x2="435" y2="486" stroke="#2e3850" stroke-width="1"/>
+    <line x1="825" y1="380" x2="825" y2="486" stroke="#2e3850" stroke-width="1"/>
+
+    <text x="80" y="430" font-size="52" fill="#77c1d2">3.2 kB</text>
+    <text x="80" y="470" font-size="22" fill="#a1a9b8">minified and gzipped</text>
+
+    <text x="470" y="430" font-size="52" fill="#f4f6fa">6.25M</text>
+    <text x="470" y="470" font-size="22" fill="#a1a9b8">static matches a second</text>
+
+    <text x="860" y="430" font-size="52" fill="#f4f6fa">0</text>
+    <text x="860" y="470" font-size="22" fill="#a1a9b8">deps besides Alpine.js</text>
+
+    <rect x="80" y="536" width="560" height="52" rx="8" fill="#1c2335" stroke="#2e3850"/>
+    <text x="102" y="569" font-size="21">
+      <tspan fill="#77c1d2">$</tspan><tspan fill="#f4f6fa" dx="12">npm install @shaun/alpinejs-router</tspan>
+    </text>
+
+    <text x="1200" y="569" text-anchor="end" font-size="19" fill="#a1a9b8">github.com/shaunlee/alpinejs-router</text>
+  </g>
+</svg>

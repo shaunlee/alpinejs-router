@@ -27,3 +27,9 @@ bun.lock
 *.sw?
 gen
 TODO
+
+# Pages: assembled site and the demo scripts the workflow copies in
+_site
+site/demo/*.min.js
+.impeccable/
+.claude/

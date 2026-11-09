@@ -1,0 +1,70 @@
+name: Pages
+
+# Publishes site/ (plus the social preview from docs/images/ and the scripts
+# the live demo runs) to https://shaunlee.github.io/alpinejs-router/.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "src/**"
+      - "docs/images/social-preview.png"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      # The demo runs this commit's router, not the last npm release.
+      - name: Build the router
+        run: |
+          npm ci
+          npm run build:cdn
+      - name: Assemble the site
+        run: |
+          mkdir -p _site/images
+          cp -R site/. _site/
+          cp docs/images/social-preview.png _site/images/
+          cp dist/cdn.min.js _site/demo/router.min.js
+          tmp=$(mktemp -d)
+          (cd "$tmp" && npm pack alpinejs@3 --silent >/dev/null && tar -xzf alpinejs-*.tgz)
+          cp "$tmp/package/dist/cdn.min.js" _site/demo/alpine.min.js
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+      # Tells Bing (and through it ChatGPT search and Copilot), Yandex and the
+      # other IndexNow engines that the page changed. The key file lives in
+      # site/, so it authorizes URLs under /alpinejs-router/ only. 202 means the
+      # key is still being validated. A failed ping does not undo the deploy.
+      - name: Ping IndexNow
+        continue-on-error: true
+        env:
+          KEY: 5c0babd8abbd02ab23ce84b2b5e91812
+          SITE: https://shaunlee.github.io/alpinejs-router/
+        run: |
+          code=$(curl -sS -o /dev/null -w '%{http_code}' -G https://api.indexnow.org/indexnow \
+            --data-urlencode "url=$SITE" --data-urlencode "key=$KEY" \
+            --data-urlencode "keyLocation=${SITE}${KEY}.txt")
+          echo "IndexNow replied $code"
+          case $code in 200|202) ;; *) exit 1 ;; esac

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live demo · alpinejs-router</title>
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<!-- Both files are copied in by the Pages workflow: the router from this
+     repository's build, Alpine from npm. The router must load first. -->
+<script src="router.min.js" defer></script>
+<script src="alpine.min.js" defer></script>
+<style>
+@font-face { font-family: "Inter"; src: url("../fonts/inter-latin-var.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url("../fonts/jetbrains-mono-latin-var.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  display: flex; flex-direction: column;
+  background: #141b2b; color: #d3d8e2;
+  font: 400 15px/1.5 "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+[x-cloak] { display: none !important; }
+code, pre { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-variant-ligatures: none; }
+a { color: inherit; text-decoration: none; }
+nav { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 12px; border-bottom: 1px solid #232c40; }
+nav a { padding: 4px 10px; border-radius: 6px; font-size: 14px; color: #a1a9b8; }
+nav a:hover { color: #f4f6fa; background: rgba(255,255,255,.05); }
+nav a.active { color: #77c1d2; }
+nav a.exact-active { color: #0b1220; background: #77c1d2; }
+main { flex: 1; padding: 16px 18px; }
+h1 { margin: 0 0 6px; color: #f4f6fa; font-size: 20px; letter-spacing: -0.01em; }
+p { margin: 0; color: #a1a9b8; font-size: 14px; }
+p + p { margin-top: 6px; }
+p code, h1 code { font-size: 13px; color: #d3d8e2; background: rgba(255,255,255,.06); border-radius: 4px; padding: 1px 4px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.row a, .row button {
+  font: inherit; font-size: 13.5px; color: #77c1d2; background: none; cursor: pointer;
+  border: 1px solid rgba(119,193,210,.45); border-radius: 6px; padding: 3px 10px;
+}
+.row a:hover, .row button:hover { background: rgba(119,193,210,.1); }
+.loading { color: #77c1d2; font-size: 14px; }
+.state { margin: 0; padding: 9px 18px 11px; border-top: 1px solid #232c40; background: #10161f; font-size: 12.5px; line-height: 19px; color: #a1a9b8; white-space: pre-wrap; word-break: break-all; }
+.state b { color: #6fd3ea; font-weight: 400; }
+</style>
+</head>
+<body x-data x-init="$router.config({ mode: 'hash', base: location.pathname })"
+      x-effect="$router.path, $router.query, parent.postMessage({ demo: 'alpinejs-router', url: location.hash || '#/' }, location.origin)">
+
+<nav>
+  <a x-link.activity href="/">Home</a>
+  <a x-link.activity href="/hello/alpine">Hello</a>
+  <a x-link.activity href="/users/42">User 42</a>
+  <a x-link.activity href="/search?q=router">Search</a>
+  <a x-link.activity href="/about">About</a>
+  <a x-link.activity href="/nowhere">Missing</a>
+</nav>
+
+<main>
+  <template x-route="/">
+    <section>
+      <h1>Home</h1>
+      <p>Every link above is an <code>&lt;a x-link&gt;</code>. Each page is a <code>&lt;template x-route&gt;</code>. Watch the address bar and the state below.</p>
+    </section>
+  </template>
+
+  <template x-route="/hello/:name">
+    <section>
+      <h1>Hello, <span x-text="$router.params.name"></span></h1>
+      <p>Matched <code>/hello/:name</code>. The param is in <code>$router.params.name</code>.</p>
+      <div class="row">
+        <a x-link href="/hello/world">/hello/world</a>
+        <button type="button" @click="$router.replace('/hello/replaced')">$router.replace(…)</button>
+      </div>
+    </section>
+  </template>
+
+  <template x-route="/users/:id(\d+)">
+    <section>
+      <h1>User #<span x-text="$router.params.id"></span></h1>
+      <p>The route is <code>/users/:id(\d+)</code>, so only digits match.</p>
+      <div class="row">
+        <a x-link href="/users/7">/users/7</a>
+        <a x-link href="/users/abc">/users/abc</a>
+      </div>
+    </section>
+  </template>
+
+  <template x-route="/search">
+    <section>
+      <h1>Search: <span x-text="$router.query.q"></span></h1>
+      <p>Page <code x-text="$router.query.page ?? 1"></code>. The links below come from <code>$router.resolve({ page })</code>.</p>
+      <div class="row">
+        <a x-link :href="$router.resolve({ page: 1 })">page 1</a>
+        <a x-link :href="$router.resolve({ page: 2 })">page 2</a>
+        <a x-link :href="$router.resolve({ page: 3 })">page 3</a>
+      </div>
+    </section>
+  </template>
+
+  <template x-route="/about" template="./about.html"></template>
+
+  <template x-route.notfound>
+    <section>
+      <h1>Not found</h1>
+      <p>No route matched <code x-text="$router.path"></code>, so <code>x-route.notfound</code> rendered.</p>
+    </section>
+  </template>
+
+  <p class="loading" x-show="$router.loading" x-cloak>Loading template…</p>
+</main>
+
+<pre class="state" aria-live="polite"><b>path</b>   <span x-text="$router.path"></span>
+<b>params</b> <span x-text="JSON.stringify($router.params)"></span>
+<b>query</b>  <span x-text="JSON.stringify($router.query)"></span></pre>
+
+</body>
+</html>
