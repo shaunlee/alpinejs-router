@@ -16,7 +16,8 @@
     "build": "vite build --mode module && vite build --mode cdn && vite build --mode cdn-es2015",
     "build:module": "vite build --mode module",
     "build:cdn": "vite build --mode cdn",
-    "build:legacy": "vite build --mode cdn-es2015"
+    "build:legacy": "vite build --mode cdn-es2015",
+    "prepublishOnly": "npm run build"
   },
   "author": "Shaun Li <shonhen@gmail.com>",
   "license": "MIT",
